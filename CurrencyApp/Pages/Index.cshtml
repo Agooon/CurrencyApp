@@ -1,10 +1,22 @@
-﻿@page
+﻿@page 
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (!string.IsNullOrWhiteSpace(Model.ErrorString) || Model.TableA == null)
+{
+    <div class="h2">@Model.ErrorString</div>
+    <div class="text-center">
+        @await Html.PartialAsync("~/Pages/Shared/_DateInputPartial.cshtml", Model.TableA.EffectiveDate)
+    </div>
+}
+else
+{
+
+    <div class="text-center m-md-3">
+        <h1 class="display-2">Tabela kursówww walut z dnia @Model.TableA.EffectiveDate</h1>
+        @await Html.PartialAsync("~/Pages/Shared/_DateInputPartial.cshtml", Model.TableA.EffectiveDate)
+    </div>
+    @await Html.PartialAsync("~/Pages/Shared/_TableAPartial.cshtml", Model.TableA)
+}

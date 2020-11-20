@@ -1,0 +1,15 @@
+﻿@model string
+@if (Model != null)
+{
+    <form method="get">
+        <input type="date" value="@Model" name="date" />
+        <input type="submit" />
+    </form>
+}
+else
+{
+    <form method="get">
+        <input type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" name="date" />
+        <input type="submit" />
+    </form>
+}

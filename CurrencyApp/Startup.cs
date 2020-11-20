@@ -26,6 +26,10 @@ namespace CurrencyApp
             services.AddRazorPages();
 
             services.AddHttpClient();
+            services.AddHttpClient("nbp", config =>
+            {
+                config.BaseAddress = new Uri(Configuration.GetValue<string>("NbpAPI"));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

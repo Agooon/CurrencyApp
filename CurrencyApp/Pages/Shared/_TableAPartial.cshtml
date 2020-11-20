@@ -1,0 +1,21 @@
+﻿@model CurrencyApp.Models.TableAModel
+
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>Kod</th>
+            <th>Waluta</th>
+            <th>Wartość</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var rate in Model.Rates)
+        {
+            <tr>
+                <td>@rate.Code</td>
+                <td>@rate.Currency</td>
+                <td>@rate.Mid</td>
+            </tr>
+        }
+    </tbody>
+</table>
