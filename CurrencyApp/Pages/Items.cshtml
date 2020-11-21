@@ -1,0 +1,27 @@
+﻿@page
+@model CurrencyApp.Pages.ItemsModel
+@{
+    ViewData["Title"] = "Lista przedmiotów";
+}
+
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>Nazwa</th>
+            <th>Data</th>
+            <th>Cena</th>
+            <th>Waluta</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Date</td>
+                <td>@item.Price</td>
+                <td>@item.Currency</td>
+            </tr>
+        }
+    </tbody>
+</table>

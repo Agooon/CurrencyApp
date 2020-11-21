@@ -15,16 +15,14 @@ namespace CurrencyApp.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly ILogger<IndexModel> _logger;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _configuration;
         private int counter = 0;
         public TableAModel TableA { get; set; }
         public string ErrorString { get; set; }
-        public string Date { get; set; }
-        public IndexModel(ILogger<IndexModel> logger, IHttpClientFactory clientFactory, IConfiguration iConfig)
+        public string Date { get; set; } = "";
+        public IndexModel(IHttpClientFactory clientFactory, IConfiguration iConfig)
         {
-            _logger = logger;
             _clientFactory = clientFactory;
             _configuration = iConfig;
         }
@@ -44,11 +42,11 @@ namespace CurrencyApp.Pages
         }
 
         public async Task OnGetAsync(string date = "")
-        {
-            Date = date;
+        { 
             // date = RRRR-MM-DD
             var maxNumberOfCalls = _configuration.GetValue<int>("MaxNumberOfCalls");
             var client = _clientFactory.CreateClient("nbp");
+            Date = date;
 
             if (date != "" && !StaticFunctions.IsValidDate(date, "yyyy-MM-dd"))
             {

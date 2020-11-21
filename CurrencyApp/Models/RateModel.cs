@@ -1,6 +1,6 @@
 ﻿namespace CurrencyApp.Models
 {
-    public class Rate
+    public class RateModel
     {
         public string Currency { get; set; }
         public string Code { get; set; }

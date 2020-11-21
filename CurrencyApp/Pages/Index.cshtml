@@ -1,4 +1,5 @@
-﻿@page 
+﻿@page
+
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -15,8 +16,14 @@ else
 {
 
     <div class="text-center m-md-3">
-        <h1 class="display-2">Tabela kursówww walut z dnia @Model.TableA.EffectiveDate</h1>
-        @await Html.PartialAsync("~/Pages/Shared/_DateInputPartial.cshtml", Model.TableA.EffectiveDate)
+        <h2>Tabela kursów waluts z dnia @Model.TableA.EffectiveDate</h2>
+        @if (Model.Date != "" && Model.Date != @Model.TableA.EffectiveDate)
+        {
+            <h5 class="text-danger">Nie znaleziono tabeli z dnia: @Model.Date</h5>
+        }
+        <div class="h3">
+            @await Html.PartialAsync("~/Pages/Shared/_DateInputPartial.cshtml", Model.TableA.EffectiveDate)
+        </div>
     </div>
     @await Html.PartialAsync("~/Pages/Shared/_TableAPartial.cshtml", Model.TableA)
 }
