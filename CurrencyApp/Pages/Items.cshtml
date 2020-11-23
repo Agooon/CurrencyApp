@@ -1,27 +1,69 @@
-﻿@page
+﻿@page "{handler?}"
+
+
 @model CurrencyApp.Pages.ItemsModel
 @{
     ViewData["Title"] = "Lista przedmiotów";
 }
-
-<table class="table table-striped">
+@Html.AntiForgeryToken()
+<table class="table">
     <thead class="thead-dark">
         <tr>
-            <th>Nazwa</th>
-            <th>Data</th>
-            <th>Cena</th>
-            <th>Waluta</th>
+            <th><a class="fa-link" asp-page-handler="Sort" asp-route-sortOption="@Model.SortName">Nazwa</a></th>
+            <th><a class="fa-link" asp-page-handler="Sort" asp-route-sortOption="@Model.SortDate">Date</a></th>
+            <th><a class="fa-link" asp-page-handler="Sort" asp-route-sortOption="@Model.SortPrice">Cena</a></th>
+            <th><a class="fa-link" asp-page-handler="Sort" asp-route-sortOption="@Model.SortCurrency">Waluta</a></th>
+            <th><a class="fa-link" asp-page-handler="Sort" asp-route-sortOption="@Model.SortRate">Kurs</a></th>
+            <th>Cena po danym kursie</th>
+            <th>Waluta docelowa</th>
         </tr>
     </thead>
-    <tbody>
-        @foreach (var item in Model.Items)
+    <tbody id="sortable">
+        @{int counter = 0; }
+        @foreach (var item in Model.items)
         {
-            <tr>
+            <tr id="item-@counter" class="listHover">
                 <td>@item.Name</td>
                 <td>@item.Date</td>
                 <td>@item.Price</td>
-                <td>@item.Currency</td>
+                <td>@item.CurrencyFrom</td>
+                <td>@item.Rate</td>
+                <td>@item.ConvertedPrice</td>
+                <td>@item.CurrencyTo</td>
             </tr>
+            counter++;
         }
     </tbody>
 </table>
+
+
+@section scripts{
+    <script src="~/lib/jqueryui/jquery-ui.js"></script>
+    <script>
+        $(function () {
+            $("#sortable").sortable({
+                items: "tr",
+                placeholder: "highLight",
+                update: function (event, ui) {
+                    var ids = $("#sortable").sortable("serialize");
+                    ids = ids.replace("item[]=", "").split("&item[]=").map(x => parseInt(x));
+                    var url = "/Items?Handler=ChangePos";
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        data: { ids: ids },
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+                        }
+                    }).done(function (result) {
+
+                    });
+                }
+            });
+        });
+    </script>
+
+}
+@section styles{
+    <link href="~/lib/jqueryui/jquery-ui.css" rel="stylesheet" />
+}

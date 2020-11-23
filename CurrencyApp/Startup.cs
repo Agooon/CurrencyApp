@@ -24,6 +24,7 @@ namespace CurrencyApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages().AddRazorRuntimeCompilation();
+            services.AddAntiforgery(o => o.HeaderName = "XSRF-TOKEN");
 
             services.AddHttpClient();
             services.AddHttpClient("nbp", config =>
