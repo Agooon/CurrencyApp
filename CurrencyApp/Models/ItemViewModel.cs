@@ -3,9 +3,9 @@ using System.Globalization;
 
 namespace CurrencyApp.Models
 {
-    public class ItemModel
+    public class ItemViewModel
     {
-        public ItemModel(string name, string date, string currencyFrom, decimal price, decimal rate, int position, string currencyTo = "PLN")
+        public ItemViewModel(string name, string date, string currencyFrom, decimal price, decimal rate,string dateTable, int position, string currencyTo = "PLN")
         {
             Name = name;
             Date = date;
@@ -14,7 +14,8 @@ namespace CurrencyApp.Models
             Rate = rate;
             CurrencyTo = currencyTo;
             Position = position;
-            ConvertedPrice = decimal.Round(price / rate, 3);
+            DateTable = dateTable;
+            ConvertedPrice = decimal.Round(price * rate, 3);
         }
         public string Name { get; set; }
         public string Date { get; set; }
@@ -22,7 +23,8 @@ namespace CurrencyApp.Models
         public decimal Price { get; set; }
         public string CurrencyFrom { get; set; }
         public decimal Rate { get; set; }
-        public string CurrencyTo { get; set; }
+        public string DateTable { get; set; }
         public decimal ConvertedPrice { get; set; }
+        public string CurrencyTo { get; set; }
     }
 }
