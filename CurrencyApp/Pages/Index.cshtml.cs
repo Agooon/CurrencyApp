@@ -13,18 +13,21 @@ using Microsoft.Extensions.Logging;
 
 namespace CurrencyApp.Pages
 {
+    //[Authorize(Roles = "Administrator")]
     public class IndexModel : PageModel
     {
         private readonly IHttpClientFactory _clientFactory;
+        private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
         private int counter = 0;
         public TableAModel TableA { get; set; }
         public string ErrorString { get; set; }
         public string Date { get; set; } = "";
-        public IndexModel(IHttpClientFactory clientFactory, IConfiguration iConfig)
+        public IndexModel(IHttpClientFactory clientFactory, IConfiguration iConfig, ILogger<IndexModel> logger)
         {
             _clientFactory = clientFactory;
             _configuration = iConfig;
+            _logger = logger;
         }
 
         private async Task<List<TableAModel>> GetCorrectCall(HttpClient client, string date)
@@ -68,8 +71,6 @@ namespace CurrencyApp.Pages
             }
             TableA = call.First();
             ErrorString = null;
-
-
         }
     }
 }

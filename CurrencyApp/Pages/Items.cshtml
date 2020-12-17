@@ -15,11 +15,13 @@
 
     @* Center table *@
     <div class="container col-md-9 col-sm-12">
+        @* For adding an item *@
         <form method="post">
         </form>
+        @* For adding an Table *@
         @await Html.PartialAsync("~/Pages/ItemsPartials/_ItemTablePartial.cshtml", Model)
 
-        @* For adding an item *@
+
     </div>
 </div>
 
@@ -30,29 +32,6 @@
     <script src="~/js/itemTableScript.js"></script>
     <script>
         $(function () {
-            $.ajax({
-                url: "/Items/ReturnJson",
-                type: "POST",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
-                }
-            }).done(function (result) {
-                var stringText = result;
-                window.localStorage.setItem("ItemsStorage", stringText);
-            });
-
-            $.ajax({
-                url: "/Items/ReturnJson",
-                type: "POST",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
-                }
-            }).done(function (result) {
-                var stringText = result;
-                window.localStorage.setItem("ItemsStorage", stringText);
-            });
-
-
             $("#sortable").sortable({
                 items: "tr",
                 placeholder: "table-active"

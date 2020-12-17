@@ -43,27 +43,12 @@ namespace CurrencyApp.Pages
             SortCurrency = "currency";
             SortRate = "rate";
         }
-        public void SetItems()
-        {
-            // getting items from database
-            // items = ???
-        }
-        public void InitializeDatabase()
-        {
-
-            items = TableOperations.GenerateTestList();
-            CookieOptions options = new CookieOptions()
-            {
-                Expires = DateTime.MaxValue
-            };
-            string itemsString = JsonConvert.SerializeObject(items);
-            Response.Cookies.Append("ItemsCookie", itemsString, options);
-        }
-
         // To get list of items
         public void OnGet(string sortOrder)
         {
+            // Getting Data from Database !!! TO-DO !!!
             SetItems();
+            // Getting Data from Database !!! TO-DO !!!
             SetCheckboxes();
         }
 
@@ -77,13 +62,20 @@ namespace CurrencyApp.Pages
             SortCurrency = sortOption == "currency" ? "currency_desc" : "currency";
             SortRate = sortOption == "rate_desc" ? "rate" : "rate_desc";
 
+            // Getting Data from Database !!! TO-DO !!!
             SetItems();
+            // Getting Data from Database !!! TO-DO !!!
             SetCheckboxes();
 
             if (items == null || items.Count == 0)
                 return;
             if (!string.IsNullOrWhiteSpace(sortOption))
                 TableOperations.ItemSort(ref items, sortOption);
+        }
+        public void SetItems()
+        {
+            // getting items from database
+            // items = ???
         }
         public void SetCheckboxes()
         {
@@ -131,12 +123,16 @@ namespace CurrencyApp.Pages
         {
             // Saving changes to database
         }
-        // On Post return an json item list
+        // On Post add items to database
         public void OnPostImportTable(string tableString)
         {
             throw new NotImplementedException();
         }
-        //To get list to outuput excel
+        //To get list to outuput excel - \t as a separator of columns \n as separator of rows
+        //  colname1    colname2    colname3    ...
+        //  val11       val12       val13       ...
+        //  val21       val22       val23       ...
+        //  ...         ...         ...
         public void OnGetExportTable()
         {
             throw new NotImplementedException();
