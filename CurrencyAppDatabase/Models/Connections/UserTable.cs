@@ -1,4 +1,4 @@
-﻿using CurrenycAppDatabase.Models.CurrencyApp;
+﻿using CurrencyAppDatabase.Models.CurrencyApp;
 
 namespace CurrencyAppDatabase.Models.CurrencyApp.Connections
 {

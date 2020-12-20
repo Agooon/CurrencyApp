@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 
 namespace CurrencyApp.Pages
 {
-    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly IHttpClientFactory _clientFactory;

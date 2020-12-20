@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CurrencyAppDatabase.Migrations
 {
     [DbContext(typeof(CurrencyContext))]
-    [Migration("20201219033307_DatabaseInit")]
-    partial class DatabaseInit
+    [Migration("20201220214047_ItemTableUpdate")]
+    partial class ItemTableUpdate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -35,38 +35,7 @@ namespace CurrencyAppDatabase.Migrations
                     b.ToTable("RegistrationCodes");
                 });
 
-            modelBuilder.Entity("CurrencyAppDatabase.Models.CurrencyApp.Connections.UserTable", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TableId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "TableId");
-
-                    b.HasIndex("TableId");
-
-                    b.ToTable("UserTables");
-                });
-
-            modelBuilder.Entity("CurrencyAppDatabase.Models.CurrencyApp.ItemTable", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("VARCHAR(256)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ItemTables");
-                });
-
-            modelBuilder.Entity("CurrenycAppDatabase.Models.CurrencyApp.AppUser", b =>
+            modelBuilder.Entity("CurrencyAppDatabase.Models.CurrencyApp.AppUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -142,7 +111,22 @@ namespace CurrencyAppDatabase.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("CurrenycAppDatabase.Models.CurrencyApp.Item", b =>
+            modelBuilder.Entity("CurrencyAppDatabase.Models.CurrencyApp.Connections.UserTable", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TableId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "TableId");
+
+                    b.HasIndex("TableId");
+
+                    b.ToTable("UserTables");
+                });
+
+            modelBuilder.Entity("CurrencyAppDatabase.Models.CurrencyApp.Item", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -164,9 +148,15 @@ namespace CurrencyAppDatabase.Migrations
                     b.Property<DateTime>("DateTable")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("ItemTableId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -176,10 +166,28 @@ namespace CurrencyAppDatabase.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ItemTableId");
+
                     b.ToTable("Items");
                 });
 
-            modelBuilder.Entity("CurrenycAppDatabase.Models.Identity.AppRole", b =>
+            modelBuilder.Entity("CurrencyAppDatabase.Models.CurrencyApp.ItemTable", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("VARCHAR(256)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ItemTables");
+                });
+
+            modelBuilder.Entity("CurrencyAppDatabase.Models.Identity.AppRole", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -311,7 +319,7 @@ namespace CurrencyAppDatabase.Migrations
 
             modelBuilder.Entity("CurrencyAppDatabase.Models.CurrencyApp.Connections.UserTable", b =>
                 {
-                    b.HasOne("CurrenycAppDatabase.Models.CurrencyApp.AppUser", "User")
+                    b.HasOne("CurrencyAppDatabase.Models.CurrencyApp.AppUser", "User")
                         .WithMany("ItemTables")
                         .HasForeignKey("TableId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -324,9 +332,16 @@ namespace CurrencyAppDatabase.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("CurrencyAppDatabase.Models.CurrencyApp.Item", b =>
+                {
+                    b.HasOne("CurrencyAppDatabase.Models.CurrencyApp.ItemTable", null)
+                        .WithMany("Items")
+                        .HasForeignKey("ItemTableId");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.HasOne("CurrenycAppDatabase.Models.Identity.AppRole", null)
+                    b.HasOne("CurrencyAppDatabase.Models.Identity.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -335,7 +350,7 @@ namespace CurrencyAppDatabase.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("CurrenycAppDatabase.Models.CurrencyApp.AppUser", null)
+                    b.HasOne("CurrencyAppDatabase.Models.CurrencyApp.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -344,7 +359,7 @@ namespace CurrencyAppDatabase.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("CurrenycAppDatabase.Models.CurrencyApp.AppUser", null)
+                    b.HasOne("CurrencyAppDatabase.Models.CurrencyApp.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -353,13 +368,13 @@ namespace CurrencyAppDatabase.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
-                    b.HasOne("CurrenycAppDatabase.Models.Identity.AppRole", null)
+                    b.HasOne("CurrencyAppDatabase.Models.Identity.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CurrenycAppDatabase.Models.CurrencyApp.AppUser", null)
+                    b.HasOne("CurrencyAppDatabase.Models.CurrencyApp.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -368,7 +383,7 @@ namespace CurrencyAppDatabase.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("CurrenycAppDatabase.Models.CurrencyApp.AppUser", null)
+                    b.HasOne("CurrencyAppDatabase.Models.CurrencyApp.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

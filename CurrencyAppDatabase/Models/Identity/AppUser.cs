@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CurrenycAppDatabase.Models.CurrencyApp
+namespace CurrencyAppDatabase.Models.CurrencyApp
 {
     public class AppUser : IdentityUser<int>
     {

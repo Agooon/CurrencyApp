@@ -1,12 +1,12 @@
 ﻿using CurrencyAppDatabase.Models.AdminPanel;
 using CurrencyAppDatabase.Models.CurrencyApp;
 using CurrencyAppDatabase.Models.CurrencyApp.Connections;
-using CurrenycAppDatabase.Models.CurrencyApp;
-using CurrenycAppDatabase.Models.Identity;
+using CurrencyAppDatabase.Models.CurrencyApp;
+using CurrencyAppDatabase.Models.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace CurrenycAppDatabase.DataAccess
+namespace CurrencyAppDatabase.DataAccess
 {
     public class CurrencyContext : IdentityDbContext<AppUser, AppRole, int>
     {

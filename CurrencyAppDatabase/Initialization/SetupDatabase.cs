@@ -1,6 +1,6 @@
-﻿using CurrenycAppDatabase.DataAccess;
-using CurrenycAppDatabase.Models.CurrencyApp;
-using CurrenycAppDatabase.Models.Identity;
+﻿using CurrencyAppDatabase.DataAccess;
+using CurrencyAppDatabase.Models.CurrencyApp;
+using CurrencyAppDatabase.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -68,6 +68,30 @@ namespace CurrencyAppDatabase.Initialization
 
                 if (!roleExist)
                     await _roleManager.CreateAsync(new AppRole(roleName));
+            }
+            await CreateSampleUser(roles[0]);
+        }
+
+        // For test purposes
+        private static async Task CreateSampleUser(string roleName,string userName="BasicUser", string password="User123", string userEmail="user123@simple.com")
+        {
+            var basicUser = await _userManager.FindByNameAsync(userName);
+
+            if (basicUser != null)
+                return;
+            else
+            {
+                var newUser = new AppUser
+                {
+                    UserName = userName,
+                    Email = userEmail,
+                    CreatedAt = DateTime.Now
+                };
+
+                var createAdmin = await _userManager.CreateAsync(newUser, password);
+
+                if (createAdmin.Succeeded)
+                    await _userManager.AddToRoleAsync(newUser, roleName);
             }
         }
     }

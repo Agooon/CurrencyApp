@@ -1,7 +1,7 @@
 using CurrencyAppDatabase.Initialization;
-using CurrenycAppDatabase.DataAccess;
-using CurrenycAppDatabase.Models.CurrencyApp;
-using CurrenycAppDatabase.Models.Identity;
+using CurrencyAppDatabase.DataAccess;
+using CurrencyAppDatabase.Models.CurrencyApp;
+using CurrencyAppDatabase.Models.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -50,19 +50,18 @@ namespace CurrencyApp
             // Security //
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole("Administrator"));
+                options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole("Admin"));
             });
 
             services.AddRazorPages().AddRazorRuntimeCompilation()
                 .AddRazorPagesOptions(config => {
-                    config.Conventions.AuthorizePage("/Account/Secured");
-                    config.Conventions.AuthorizePage("/Account/Policy");
+                    config.Conventions.AuthorizeFolder("/");
+                    config.Conventions.AuthorizeFolder("/Admin", "RequireAdministratorRole");
                     //config.Conventions.AuthorizeFolder("/AdminPanel","RequireAdministratorRole");
                 });
 
             services.AddAntiforgery(o => o.HeaderName = "XSRF-TOKEN");
             /////////////////////////////           
-
 
             // Api connections //
             services.AddHttpClient(); 

@@ -14,7 +14,7 @@ namespace CurrencyAppDatabase.Models.CurrencyApp
         [Column(TypeName ="VARCHAR(256)")]
         public string Name { get; set; }
 
-        
+        public virtual ICollection<Item> Items { get; set; }
         public virtual ICollection<UserTable> Users { get; set; }
     }
 }

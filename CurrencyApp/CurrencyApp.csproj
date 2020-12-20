@@ -30,7 +30,6 @@
 
   <ItemGroup>
     <Folder Include="Pages\Account\Manage\" />
-    <Folder Include="Pages\Admin\" />
   </ItemGroup>
 
 </Project>

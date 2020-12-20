@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace CurrenycAppDatabase.Models.CurrencyApp
+namespace CurrencyAppDatabase.Models.CurrencyApp
 {
     public class Item
     {
@@ -13,6 +13,8 @@ namespace CurrenycAppDatabase.Models.CurrencyApp
         public DateTime Date { get; set; }
         [Required]
         public decimal Price { get; set; }
+        [Required]
+        public int Position { get; set; }
         public string CurrencyFrom { get; set; }
         public decimal Rate { get; set; }
         public DateTime DateTable { get; set; }

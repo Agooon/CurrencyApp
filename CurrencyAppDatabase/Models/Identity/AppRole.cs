@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace CurrenycAppDatabase.Models.Identity
+namespace CurrencyAppDatabase.Models.Identity
 {
     public class AppRole : IdentityRole<int>
     {
