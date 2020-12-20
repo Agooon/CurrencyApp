@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using CurrencyApp.Backend;
 using CurrencyApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CurrencyApp.Pages
 {
-    //[Authorize(Roles = "Administrator")]
+    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly IHttpClientFactory _clientFactory;

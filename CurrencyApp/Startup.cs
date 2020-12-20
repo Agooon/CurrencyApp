@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Identity;
 using System;
 
 namespace CurrencyApp
@@ -29,14 +30,23 @@ namespace CurrencyApp
             {
                 options.User.RequireUniqueEmail = true;
                 options.Password.RequireNonAlphanumeric = false;
-            }).AddEntityFrameworkStores<CurrencyContext>();        
+            }).AddEntityFrameworkStores<CurrencyContext>();
 
             services.AddDbContext<CurrencyContext>(config => {
                 config.UseSqlServer(Configuration.GetConnectionString("DbConnection"));
             });
             /////////////////////////////
-            
 
+            services.ConfigureApplicationCookie(options =>
+            {
+                // Cookie settings
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+                options.LoginPath = "/Account/Login";
+                options.AccessDeniedPath = "/Account/AccessDenied";
+                options.SlidingExpiration = true;
+            });
             // Security //
             services.AddAuthorization(options =>
             {

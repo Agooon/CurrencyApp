@@ -1,18 +1,16 @@
+using CurrencyApp.Backend;
+using CurrencyApp.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
-using CurrencyApp.Backend;
-using CurrencyApp.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 
 namespace CurrencyApp.Pages
 {
+    [Authorize]
     public class ItemsModel : PageModel
     {
         private readonly IHttpClientFactory _clientFactory;

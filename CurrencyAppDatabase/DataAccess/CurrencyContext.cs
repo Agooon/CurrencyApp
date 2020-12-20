@@ -5,17 +5,17 @@ using CurrenycAppDatabase.Models.CurrencyApp;
 using CurrenycAppDatabase.Models.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CurrenycAppDatabase.DataAccess
 {
     public class CurrencyContext : IdentityDbContext<AppUser, AppRole, int>
     {
         public CurrencyContext(DbContextOptions<CurrencyContext> options) : base(options) { }
+
+        public CurrencyContext()
+        {
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
