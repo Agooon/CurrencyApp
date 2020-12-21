@@ -4,14 +4,16 @@ using CurrencyAppDatabase.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CurrencyAppDatabase.Migrations
 {
     [DbContext(typeof(CurrencyContext))]
-    partial class CurrencyContextModelSnapshot : ModelSnapshot
+    [Migration("20201221221033_LogsAndAttributes")]
+    partial class LogsAndAttributes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -132,7 +134,7 @@ namespace CurrencyAppDatabase.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("ConvertedPrice")
-                        .HasColumnType("decimal(12,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("CurrencyFrom")
                         .HasColumnType("VARCHAR(8)");
@@ -158,10 +160,10 @@ namespace CurrencyAppDatabase.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(12,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Rate")
-                        .HasColumnType("decimal(12,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 

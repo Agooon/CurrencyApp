@@ -15,7 +15,7 @@
     </thead>
     <tbody id="sortable">
         @{int counter = 0; }
-        @foreach (var item in Model.items)
+        @foreach (var item in Model.TableI.Items)
         {
             <tr id="item-@counter" class="listHover">
                 <td id="nameR" class="text-center nameR">@item.Name</td>

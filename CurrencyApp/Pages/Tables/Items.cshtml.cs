@@ -1,20 +1,22 @@
 using CurrencyApp.Backend;
-using CurrencyApp.Models;
+using CurrencyAppDatabase.DataAccess;
+using CurrencyAppDatabase.Models.CurrencyApp;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace CurrencyApp.Pages
 {
-    [Authorize]
     public class ItemsModel : PageModel
     {
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _configuration;
+        private readonly CurrencyContext _context;
         // Checkboxes
         public bool NameCheck { get; set; }
         public bool DateCheck { get; set; }
@@ -30,11 +32,12 @@ namespace CurrencyApp.Pages
         public string SortCurrency { get; set; }
         public string SortRate { get; set; }
 
-        public List<ItemViewModel> items;
-        public ItemsModel(IHttpClientFactory clientFactory, IConfiguration iConfig)
+        public ItemTable TableI { get; set; }
+        public ItemsModel(IHttpClientFactory clientFactory, IConfiguration iConfig, CurrencyContext context)
         {
             _clientFactory = clientFactory;
             _configuration = iConfig;
+            _context = context;
             SortName = "name";
             SortDate = "date_desc";
             SortPrice = "price";
@@ -42,16 +45,16 @@ namespace CurrencyApp.Pages
             SortRate = "rate";
         }
         // To get list of items
-        public void OnGet(string sortOrder)
+        public async Task OnGetAsync(int id,string sortOrder)
         {
             // Getting Data from Database !!! TO-DO !!!
-            SetItems();
+            await SetItemsAsync(id);
             // Getting Data from Database !!! TO-DO !!!
             SetCheckboxes();
         }
 
         // To sort list of items
-        public void OnGetSort(string sortOption = "")
+        public async Task OnGetSortAsync(int id,string sortOption = "")
         {
 
             SortName = sortOption == "name" ? "name_desc" : "name";
@@ -61,19 +64,22 @@ namespace CurrencyApp.Pages
             SortRate = sortOption == "rate_desc" ? "rate" : "rate_desc";
 
             // Getting Data from Database !!! TO-DO !!!
-            SetItems();
+            await SetItemsAsync(id);
+            if(TableI == null)
+            {
+                TempData["ErrorString"] = "Nie odnaleziono poszukiwanej tabeli";
+            }
             // Getting Data from Database !!! TO-DO !!!
             SetCheckboxes();
 
-            if (items == null || items.Count == 0)
-                return;
-            if (!string.IsNullOrWhiteSpace(sortOption))
-                TableOperations.ItemSort(ref items, sortOption);
+            //if (items == null || items.Count == 0)
+            //    return;
+            //if (!string.IsNullOrWhiteSpace(sortOption))
+            //    TableOperations.ItemSort(TableI.Items, sortOption);
         }
-        public void SetItems()
+        public async Task SetItemsAsync(int Id)
         {
-            // getting items from database
-            // items = ???
+            TableI = await _context.ItemTables.FirstOrDefaultAsync(x => x.Id == Id);
         }
         public void SetCheckboxes()
         {
@@ -101,14 +107,14 @@ namespace CurrencyApp.Pages
         // To change places list of items
         public void OnPostChangePos(int[] ids)
         {
-            SetItems();
-            int counter = 0;
-            foreach (var itemId in ids)
-            {
-                items[itemId].Position = counter++;
-            }
-            items = items.OrderBy(x => x.Position).ToList();
-            SaveChanges();
+            //SetItems();
+            //int counter = 0;
+            //foreach (var itemId in ids)
+            //{
+            //    items[itemId].Position = counter++;
+            //}
+            //items = items.OrderBy(x => x.Position).ToList();
+            //SaveChanges();
         }
 
         // To add an item

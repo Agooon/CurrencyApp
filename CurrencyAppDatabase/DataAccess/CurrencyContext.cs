@@ -1,7 +1,6 @@
 ﻿using CurrencyAppDatabase.Models.AdminPanel;
 using CurrencyAppDatabase.Models.CurrencyApp;
 using CurrencyAppDatabase.Models.CurrencyApp.Connections;
-using CurrencyAppDatabase.Models.CurrencyApp;
 using CurrencyAppDatabase.Models.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -39,11 +38,11 @@ namespace CurrencyAppDatabase.DataAccess
             modelBuilder.Entity<UserTable>()
                 .HasOne(ut => ut.User)
                 .WithMany(u => u.ItemTables)
-                .HasForeignKey(ut => ut.TableId);
+                .HasForeignKey(ut => ut.UserId);
             modelBuilder.Entity<UserTable>()
                 .HasOne(ut => ut.Table)
                 .WithMany(t => t.Users)
-                .HasForeignKey(ut => ut.UserId);
+                .HasForeignKey(ut => ut.TableId);
         }
     }
 }

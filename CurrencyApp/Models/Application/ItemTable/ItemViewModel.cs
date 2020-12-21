@@ -1,10 +1,18 @@
-﻿using System;
+﻿using CurrencyAppDatabase.Models.CurrencyApp;
+using System;
 using System.Globalization;
 
 namespace CurrencyApp.Models
 {
     public class ItemViewModel
     {
+        public ItemViewModel(Item dto)
+        {
+            Id = dto.Id;
+            Name = dto.Name;
+            Price = dto.Price;
+
+        }
         public ItemViewModel(string name, string date, string currencyFrom, decimal price, decimal rate,string dateTable, int position, string currencyTo = "PLN")
         {
             Name = name;
@@ -17,6 +25,7 @@ namespace CurrencyApp.Models
             DateTable = dateTable;
             ConvertedPrice = decimal.Round(price * rate, 3);
         }
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Date { get; set; }
         public decimal Price { get; set; }

@@ -4,14 +4,16 @@ using CurrencyAppDatabase.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CurrencyAppDatabase.Migrations
 {
     [DbContext(typeof(CurrencyContext))]
-    partial class CurrencyContextModelSnapshot : ModelSnapshot
+    [Migration("20201221192005_ItemToTableFixed")]
+    partial class ItemToTableFixed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -132,13 +134,13 @@ namespace CurrencyAppDatabase.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("ConvertedPrice")
-                        .HasColumnType("decimal(12,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("CurrencyFrom")
-                        .HasColumnType("VARCHAR(8)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CurrencyTo")
-                        .HasColumnType("VARCHAR(8)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -151,17 +153,16 @@ namespace CurrencyAppDatabase.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(512)")
-                        .HasMaxLength(512);
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Position")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(12,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Rate")
-                        .HasColumnType("decimal(12,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -318,14 +319,14 @@ namespace CurrencyAppDatabase.Migrations
 
             modelBuilder.Entity("CurrencyAppDatabase.Models.CurrencyApp.Connections.UserTable", b =>
                 {
-                    b.HasOne("CurrencyAppDatabase.Models.CurrencyApp.ItemTable", "Table")
-                        .WithMany("Users")
+                    b.HasOne("CurrencyAppDatabase.Models.CurrencyApp.AppUser", "User")
+                        .WithMany("ItemTables")
                         .HasForeignKey("TableId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CurrencyAppDatabase.Models.CurrencyApp.AppUser", "User")
-                        .WithMany("ItemTables")
+                    b.HasOne("CurrencyAppDatabase.Models.CurrencyApp.ItemTable", "Table")
+                        .WithMany("Users")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

@@ -1,4 +1,4 @@
-﻿using CurrencyApp.Models.Application;
+﻿using CurrencyAppDatabase.Models.CurrencyApp;
 using CurrencyAppDatabase.Models.Identity;
 using System;
 using System.Collections.Generic;
@@ -14,6 +14,6 @@ namespace CurrencyApp.Models.Admin
         public DateTime SubscriptionUntil { get; set; }
         public int LimitOfTables { get; set; }
         public List<AppRole> Roles { get; set; }
-        public List<ItemTableViewModel> Tables { get; set; }
+        public List<ItemTable> Tables { get; set; }
     }
 }
