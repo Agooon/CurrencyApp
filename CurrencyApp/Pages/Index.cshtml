@@ -4,26 +4,28 @@
 @{
     ViewData["Title"] = "Home page";
 }
-
-@if (!string.IsNullOrWhiteSpace(Model.ErrorString) || Model.TableA == null)
-{
-    <div class="h2">@Model.ErrorString</div>
-    <div class="text-center">
-        @await Html.PartialAsync("~/Pages/Shared/_DateInputPartial.cshtml", Model.TableA.EffectiveDate)
-    </div>
-}
-else
-{
-
-    <div class="text-center m-md-3">
-        <h2>Tabela kursów waluts z dnia @Model.TableA.EffectiveDate</h2>
-        @if (Model.Date != "" && Model.Date != @Model.TableA.EffectiveDate)
-        {
-            <h5 class="text-danger">Nie znaleziono tabeli z dnia: @Model.Date</h5>
-        }
-        <div class="h3">
+<div class="container">
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorString) || Model.TableA == null)
+    {
+        <div class="h2">@Model.ErrorString</div>
+        <div class="text-center">
             @await Html.PartialAsync("~/Pages/Shared/_DateInputPartial.cshtml", Model.TableA.EffectiveDate)
         </div>
-    </div>
-    @await Html.PartialAsync("~/Pages/Shared/_TableAPartial.cshtml", Model.TableA)
-}
+    }
+    else
+    {
+
+        <div class="text-center m-md-3">
+            <h2>Tabela kursów waluts z dnia @Model.TableA.EffectiveDate</h2>
+            @if (Model.Date != "" && Model.Date != @Model.TableA.EffectiveDate)
+            {
+                <h5 class="text-danger">Nie znaleziono tabeli z dnia: @Model.Date</h5>
+            }
+            <div class="h3">
+                @await Html.PartialAsync("~/Pages/Shared/_DateInputPartial.cshtml", Model.TableA.EffectiveDate)
+            </div>
+        </div>
+        @await Html.PartialAsync("~/Pages/Shared/_TableAPartial.cshtml", Model.TableA)
+    }
+</div>
+

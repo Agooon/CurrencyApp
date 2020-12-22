@@ -14,6 +14,7 @@ namespace CurrencyAppDatabase.Models.CurrencyApp
         }
         [Required]
         public DateTime CreatedAt { get; set; }
+        [DisplayFormat(DataFormatString = "{0:dd-yyyy-MM}", ApplyFormatInEditMode = true)]
         public DateTime SubscriptionUntil { get; set; }
         public int LimitOfTables { get; set; }
 

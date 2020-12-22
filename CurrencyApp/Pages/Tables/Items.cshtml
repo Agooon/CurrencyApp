@@ -10,19 +10,19 @@
 <div class="row flex-row">
     @* Left Form *@
     <div class="col-md-3 pb-1">
-        @await Html.PartialAsync("~/Pages/ItemsPartials/_CheckBoxesItPartial.cshtml", Model)
+        @await Html.PartialAsync("~/Pages/Tables/ItemsPartials/_CheckBoxesItPartial.cshtml", Model)
     </div>
 
     @* Center table *@
-    <div class="container col-md-9 col-sm-12">
-        @* For adding an item *@
-        <form method="post">
-        </form>
-        @* For adding an Table *@
-        @await Html.PartialAsync("~/Pages/ItemsPartials/_ItemTablePartial.cshtml", Model)
+<div class="container col-md-9 col-sm-12">
+    @* For adding an item
+        @await Html.PartialAsync("~/Pages/Tables/ItemsPartials/_AddItemPartial.cshtml", null)*@
+
+    @* For adding an Table *@
+    @await Html.PartialAsync("~/Pages/Tables/ItemsPartials/_ItemTablePartial.cshtml", Model)
 
 
-    </div>
+</div>
 </div>
 
 
@@ -49,6 +49,26 @@
                 //    }).done(function (result) {
 
                 //    });
+            });
+            document.getElementById("updateButton").addEventListener("click", (e) => {
+                e.preventDefault();
+                var ids = $("#sortable").sortable("serialize");
+                ids = ids.replace("item[]=", "").split("&item[]=").map(x => parseInt(x));
+                var url = "/Tables/Items/SaveChanges";
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: { ids: ids },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN", $('input:hidden[name="__RequestVerificationToken"]').val());
+                    }
+                }).done(function (result) {
+
+                });
+            });
+            $("body").on("click", "button.delete", function () {
+                if (!confirm("Potwierdź usnięcie przedmiotu!"))
+                    return false;
             });
         });
     </script>

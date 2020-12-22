@@ -1,0 +1,43 @@
+﻿@model CurrencyApp.Models.Application.ItemTable.ItemAddModel
+
+<hr />
+<div class="row">
+    <div class="col-12">
+        <form asp-action="_AddItemPartial">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Date" class="control-label"></label>
+                <input asp-for="Date" class="form-control" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CurrencyFrom" class="control-label"></label>
+                <input asp-for="CurrencyFrom" class="form-control" />
+                <span asp-validation-for="CurrencyFrom" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CurrencyTo" class="control-label"></label>
+                <input asp-for="CurrencyTo" class="form-control" />
+                <span asp-validation-for="CurrencyTo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

@@ -31,13 +31,18 @@ namespace CurrencyAppDatabase.Models.CurrencyApp
         [Required]
         public int Position { get; set; }
         [Column(TypeName = "VARCHAR(8)")]
+        [Required]
         public string CurrencyFrom { get; set; }
         [Column(TypeName = "decimal(12,4)")]
+        [Required]
         public decimal Rate { get; set; }
+        [Required]
         public DateTime DateTable { get; set; }
         [Column(TypeName = "decimal(12,4)")]
+        [Required]
         public decimal ConvertedPrice { get; set; }
         [Column(TypeName = "VARCHAR(8)")]
+        [Required]
         public string CurrencyTo { get; set; }
 
         public int ItemTableId { get; set; }

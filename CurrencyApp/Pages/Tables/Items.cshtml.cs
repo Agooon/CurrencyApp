@@ -1,11 +1,15 @@
-using CurrencyApp.Backend;
 using CurrencyAppDatabase.DataAccess;
+using CurrencyAppDatabase.DatabaseOperations;
 using CurrencyAppDatabase.Models.CurrencyApp;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -16,117 +20,173 @@ namespace CurrencyApp.Pages
     {
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _configuration;
+        private readonly IMemoryCache _cache;
         private readonly CurrencyContext _context;
         // Checkboxes
-        public bool NameCheck { get; set; }
-        public bool DateCheck { get; set; }
-        public bool PriceCheck { get; set; }
-        public bool CurrencyFCheck { get; set; }
-        public bool RateCheck { get; set; }
-        public bool PriceConCheck { get; set; }
-        public bool CurrencyTCheck { get; set; }
+        [BindProperty]
+        public bool NameCheck { get; set; } // 1
+        [BindProperty]
+        public bool DateCheck { get; set; } // 2
+        [BindProperty]
+        public bool PriceCheck { get; set; } // 3
+        [BindProperty]
+        public bool CurrencyFCheck { get; set; } // 4
+        [BindProperty]
+        public bool RateCheck { get; set; }// 5
+        [BindProperty]
+        public bool PriceConCheck { get; set; } // 6
+        [BindProperty]
+        public bool DateTableCheck { get; set; } // 7
+        [BindProperty]
+        public bool CurrencyTCheck { get; set; } // 8
         // Sorting properties
         public string SortName { get; set; }
         public string SortDate { get; set; }
         public string SortPrice { get; set; }
         public string SortCurrency { get; set; }
         public string SortRate { get; set; }
-
+        // To check if there was a position change
         public ItemTable TableI { get; set; }
-        public ItemsModel(IHttpClientFactory clientFactory, IConfiguration iConfig, CurrencyContext context)
+        public ItemsModel(IHttpClientFactory clientFactory, IConfiguration iConfig, CurrencyContext context, IMemoryCache cache)
         {
             _clientFactory = clientFactory;
             _configuration = iConfig;
             _context = context;
+            // Setting up default sorts
             SortName = "name";
             SortDate = "date_desc";
             SortPrice = "price";
             SortCurrency = "currency";
             SortRate = "rate";
+            _cache = cache;
         }
         // To get list of items
-        public async Task OnGetAsync(int id,string sortOrder)
+        public async Task OnGetAsync()
         {
-            // Getting Data from Database !!! TO-DO !!!
-            await SetItemsAsync(id);
-            // Getting Data from Database !!! TO-DO !!!
+            if (User.IsInRole("Admin"))
+            {
+                TempData["BigErrorString"] = "Jako admin nie mo¿esz posiadaæ w³asnej tabeli";
+            }
+            TableI = await SetItemsAsync();
+            // Getting Data from Cookies 
             SetCheckboxes();
         }
 
         // To sort list of items
-        public async Task OnGetSortAsync(int id,string sortOption = "")
+        public async Task OnGetSortAsync(string sortOption = "")
         {
-
+            // Getting Data from Database !!! TO-DO !!!
+            TableI = await SetItemsAsync();
+            if (TableI == null)
+            {
+                TempData["BigErrorString"] = "Nie odnaleziono poszukiwanej tabeli";
+                return;
+            }
+            // Setting sort values
             SortName = sortOption == "name" ? "name_desc" : "name";
             SortDate = sortOption == "date_desc" ? "date" : "date_desc";
             SortPrice = sortOption == "price_desc" ? "price" : "price_desc";
             SortCurrency = sortOption == "currency" ? "currency_desc" : "currency";
             SortRate = sortOption == "rate_desc" ? "rate" : "rate_desc";
-
-            // Getting Data from Database !!! TO-DO !!!
-            await SetItemsAsync(id);
-            if(TableI == null)
-            {
-                TempData["ErrorString"] = "Nie odnaleziono poszukiwanej tabeli";
-            }
+     
             // Getting Data from Database !!! TO-DO !!!
             SetCheckboxes();
 
-            //if (items == null || items.Count == 0)
-            //    return;
-            //if (!string.IsNullOrWhiteSpace(sortOption))
-            //    TableOperations.ItemSort(TableI.Items, sortOption);
+            if (TableI.Items == null || TableI.Items.Count == 0)
+                return;
+            if (!string.IsNullOrWhiteSpace(sortOption))
+                TableI.Items = TableOperations.ItemSort(TableI.Items, sortOption);
         }
-        public async Task SetItemsAsync(int Id)
+        public async Task<ItemTable> SetItemsAsync()
         {
-            TableI = await _context.ItemTables.FirstOrDefaultAsync(x => x.Id == Id);
+            // For now the user can only have 1 Table, although Database is prepared for N-N relationship
+            string username = User.Identity.Name;
+            int userId = (await _context.Users.FirstOrDefaultAsync(x => x.UserName == username)).Id;
+            // Getting Data from Database !!! TO-DO !!!
+            int tableId = (await _context.UserTables.FirstOrDefaultAsync(x => x.UserId == userId)).TableId;
+            
+            var table = await _context.ItemTables.Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == tableId);
+            table.Items = table.Items.OrderBy(x => x.Position).ToList();
+            return table; 
         }
         public void SetCheckboxes()
         {
-            // Geting checkboxes from database
-            //var checkBoxes = ???
-            //NameCheck = checkBoxes[0];
-            //DateCheck = checkBoxes[1];
-            //PriceCheck = checkBoxes[2];
-            //CurrencyFCheck = checkBoxes[3];
-            //RateCheck = checkBoxes[4];
-            //PriceConCheck = checkBoxes[5];
-            //CurrencyTCheck = checkBoxes[6];
+            // Geting checkboxes from cookies
+            if (Request.Cookies["CheboxesCookie"] == null){
+                NameCheck = false;
+                DateCheck = false;
+                PriceCheck = false;
+                CurrencyFCheck = false;
+                RateCheck = false;
+                PriceConCheck = false;
+                DateTableCheck = false;
+                CurrencyTCheck = false;
+                return;
+            }
+            var checkBoxes = JsonConvert.DeserializeObject<bool[]>(Request.Cookies["CheboxesCookie"]);
+            NameCheck = checkBoxes[0];
+            DateCheck = checkBoxes[1];
+            PriceCheck = checkBoxes[2];
+            CurrencyFCheck = checkBoxes[3];
+            RateCheck = checkBoxes[4];
+            PriceConCheck = checkBoxes[5];
+            DateTableCheck = checkBoxes[6];
+            CurrencyTCheck = checkBoxes[7];
         }
         // To save selected checkboxes
         public void OnPostChecked(bool[] checkBoxes)
         {
             // Setting the values of checkboxes, async
-            //CookieOptions options = new CookieOptions()
-            //{
-            //    Expires = DateTime.MaxValue
-            //};
-            //string itemsString = JsonConvert.SerializeObject(checkBoxes);
-            //Response.Cookies.Append("CheboxesCookie", itemsString, options);
+            CookieOptions options = new CookieOptions()
+            {
+                Expires = DateTime.MaxValue
+            };
+            string itemsString = JsonConvert.SerializeObject(checkBoxes);
+            Response.Cookies.Append("CheboxesCookie", itemsString, options);
         }
         // To change places list of items
-        public void OnPostChangePos(int[] ids)
+        public async Task ChangePosAsync(int[] ids)
         {
-            //SetItems();
-            //int counter = 0;
-            //foreach (var itemId in ids)
-            //{
-            //    items[itemId].Position = counter++;
-            //}
-            //items = items.OrderBy(x => x.Position).ToList();
-            //SaveChanges();
+            var table = await SetItemsAsync();
+            int counter = 0;
+            List<Item> items = table.Items.ToList(); // To use indexes I have to cast ICollection to List
+            foreach (var id in ids)
+            {
+                items[id].Position = counter++;
+            }
+            table.Items = items;
+            table.Items = table.Items.OrderBy(x => x.Position).ToList();
+            await _context.SaveChangesAsync();
+            TableI = table;
         }
 
         // To add an item
         public void OnPostAddItem()
         {
+            var x = 2;
             // Adding item to database
         }
-        // To save a list to cookies
-        public void SaveChanges()
+        // To delete an item
+        public async Task<IActionResult> OnPostDeleteItemAsync(int id)
         {
-            // Saving changes to database
+            TableI = await SetItemsAsync();
+            Item item = TableI.Items.FirstOrDefault(x => x.Position == id);
+            _context.Items.Remove(item);
+            await _context.SaveChangesAsync();
+            return RedirectToPage();
+            // Adding item to database
         }
+        // To save a changes in position of list to database
+        public async Task<IActionResult> OnPostSaveChangesAsync(int[] ids)
+        {
+            // Jest to wywo³ywane przy 
+            await ChangePosAsync(ids);
+            await _context.SaveChangesAsync();
+            return Page();
+        }
+
+
+
         // On Post add items to database
         public void OnPostImportTable(string tableString)
         {
