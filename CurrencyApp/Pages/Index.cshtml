@@ -7,9 +7,9 @@
 <div class="container">
     @if (!string.IsNullOrWhiteSpace(Model.ErrorString) || Model.TableA == null)
     {
-        <div class="h2">@Model.ErrorString</div>
+        <div class="h3">@Html.Raw(Model.ErrorString)</div>
         <div class="text-center">
-            @await Html.PartialAsync("~/Pages/Shared/_DateInputPartial.cshtml", Model.TableA.EffectiveDate)
+            @await Html.PartialAsync("~/Pages/Shared/_DateInputPartial.cshtml", Model)
         </div>
     }
     else
@@ -21,11 +21,38 @@
             {
                 <h5 class="text-danger">Nie znaleziono tabeli z dnia: @Model.Date</h5>
             }
+
             <div class="h3">
-                @await Html.PartialAsync("~/Pages/Shared/_DateInputPartial.cshtml", Model.TableA.EffectiveDate)
+                @await Html.PartialAsync("~/Pages/Shared/_DateInputPartial.cshtml", Model)
             </div>
         </div>
-        @await Html.PartialAsync("~/Pages/Shared/_TableAPartial.cshtml", Model.TableA)
+        <button id="btnChangeView" class="btn btn-secondary mb-2">Zmień widok</button>
+        @await Html.PartialAsync("~/Pages/Shared/_TableAPartial.cshtml", Model)
     }
 </div>
+@section scripts{
+    <script>
+        $(function () {
+            $("#mainOnesCK").change(function () {
+                if (this.checked) {
+                    $(".rate").not(".mainOne").addClass("displayNone");
+                }
+                else {
+                    $(".rate").not(".mainOne").removeClass("displayNone");
+                }
+                $("#mainOnesCK").val(this.checked);
+            });
 
+            $("#btnChangeView").click(checkClick);
+
+            function checkClick() {
+                if ($("#mainOnesCK")[0].checked) {
+                    $("#mainOnesCK").prop("checked", false).change();
+                }
+                else {
+                    $("#mainOnesCK").prop('checked', true).change();
+                }
+            }
+        });
+    </script>
+}

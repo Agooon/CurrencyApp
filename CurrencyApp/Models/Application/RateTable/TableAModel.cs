@@ -11,6 +11,6 @@ namespace CurrencyApp.Models
         public string Table { get; set; }
         public string No { get; set; }
         public string EffectiveDate { get; set; }
-        public List<RateModel> Rates { get; set; }
+        public List<RateModel> Rates { get; set; }  
     }
 }

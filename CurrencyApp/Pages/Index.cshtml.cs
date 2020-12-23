@@ -19,9 +19,14 @@ namespace CurrencyApp.Pages
         private readonly IHttpClientFactory _clientFactory;
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
+        // To show only the most important ones 
+        // Now it's gotten from configuration, but in future version
+        // A user will be define his own list with order
+        public string[] MainOnes { get; set; }
         private int counter = 0;
         public TableAModel TableA { get; set; }
         public string ErrorString { get; set; }
+        public bool MainOnesCK { get; set; }
         public string Date { get; set; } = "";
         public IndexModel(IHttpClientFactory clientFactory, IConfiguration iConfig, ILogger<IndexModel> logger)
         {
@@ -34,18 +39,18 @@ namespace CurrencyApp.Pages
         {
             try
             {
-               return await client.GetFromJsonAsync<List<TableAModel>>($"tables/A/{date}?format=json");
+                return await client.GetFromJsonAsync<List<TableAModel>>($"tables/A/{date}?format=json");
             }
             catch (Exception ex)
             {
-                ErrorString = $"Error has accured: {ex.Message}";
+                ErrorString = $"Error has accured:</br>{ex.Message}</br>";
                 return null;
             }
 
         }
 
-        public async Task OnGetAsync(string date = "")
-        { 
+        public async Task OnGetAsync(bool mainOnesCK,string date = "")
+        {
             // date = RRRR-MM-DD
             var maxNumberOfCalls = _configuration.GetValue<int>("MaxNumberOfCalls");
             var client = _clientFactory.CreateClient("nbp");
@@ -66,10 +71,12 @@ namespace CurrencyApp.Pages
             counter = 0;
             if (call == null)
             {
-                ErrorString += "\nNie odnaleziono strony z tabelami lub przekroczono ilość zapytań. Sprawdź działanie strony NBP.";
+                ErrorString += "</br>Nie odnaleziono strony z tabelami lub przekroczono ilość zapytań. Sprawdź działanie strony NBP.";
                 return;
             }
             TableA = call.First();
+            MainOnesCK = mainOnesCK;
+            MainOnes = _configuration.GetSection("Currencies").Get<string[]>();
             ErrorString = null;
         }
     }

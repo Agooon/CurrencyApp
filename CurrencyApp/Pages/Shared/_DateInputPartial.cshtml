@@ -1,8 +1,12 @@
-﻿@model string
-@if (Model != null)
+﻿@model IndexModel
+
+@if (@Model.TableA != null)
 {
     <form method="get">
-        <input type="date" value="@Model" name="date" />
+        <input type="date" value="@Model.TableA.EffectiveDate" name="date" />
+        <input type="hidden" id="mainOnesCK" value="@Model.MainOnesCK.ToString().ToLower()"
+               @if (Model.MainOnesCK) { <text> checked</text> }
+               name="mainOnesCK" />
         <input type="submit" value="Sprawdź" />
     </form>
 }
@@ -10,6 +14,11 @@ else
 {
     <form method="get">
         <input type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" name="date" />
+        <input type="hidden" id="mainOnesCK" value="@Model.MainOnesCK.ToString().ToLower()"
+               @if (Model.MainOnesCK) { <text> checked</text> }
+               name="mainOnesCK" />
         <input type="submit" value="Sprawdź" />
     </form>
 }
+
+
