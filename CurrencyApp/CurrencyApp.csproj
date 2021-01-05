@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Pages\Lottery\**" />
+    <Content Remove="Pages\Lottery\**" />
+    <EmbeddedResource Remove="Pages\Lottery\**" />
+    <None Remove="Pages\Lottery\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.10" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.10" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.10" />

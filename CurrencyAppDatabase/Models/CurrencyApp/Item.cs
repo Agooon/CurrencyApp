@@ -6,6 +6,10 @@ namespace CurrencyAppDatabase.Models.CurrencyApp
 {
     public class Item
     {
+        public Item()
+        {
+        }
+
         public Item(string name, DateTime date, string currencyFrom, decimal price, decimal rate, DateTime dateTable, int position, string currencyTo = "PLN")
         {
             Name = name;

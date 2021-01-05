@@ -1,6 +1,50 @@
 ﻿
 $(function () {
 
+    // Setup
+    // 1
+    if ($("#NameCheck")[0].checked) {
+        $("#nameH").addClass("displayNone");
+        $(".nameR").addClass("displayNone");
+    }
+    // 2
+    if ($("#DateCheck")[0].checked) {
+        $("#dateH").addClass("displayNone");
+        $(".dateR").addClass("displayNone");
+    }
+    // 3
+    if ($("#PriceCheck")[0].checked) {
+        $("#priceH").addClass("displayNone");
+        $(".priceR").addClass("displayNone");
+    }
+    // 4
+    if ($("#CurrencyFCheck")[0].checked) {
+        $("#currencyFH").addClass("displayNone");
+        $(".currencyFR").addClass("displayNone");
+    }
+    // 5
+    if ($("#RateCheck")[0].checked) {
+        $("#rateH").addClass("displayNone");
+        $(".rateR").addClass("displayNone");
+    }
+    // 6
+    if ($("#PriceConCheck")[0].checked) {
+        $("#priceCH").addClass("displayNone");
+        $(".priceCR").addClass("displayNone");
+    }
+    // 7
+    if ($("#DateTableCheck")[0].checked) {
+        $("#dateTH").addClass("displayNone");
+        $(".dateTR").addClass("displayNone");
+    }
+    // 8
+    if ($("#CurrencyTCheck")[0].checked) {
+        $("#currencyTH").addClass("displayNone");
+        $(".currencyTR").addClass("displayNone");
+    }
+
+    // For change event
+
     $("#NameCheck").change(function () {
         if (this.checked) {
             $("#nameH").addClass("displayNone");

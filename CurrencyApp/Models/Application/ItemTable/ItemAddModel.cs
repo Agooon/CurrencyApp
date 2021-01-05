@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace CurrencyApp.Models.Application.ItemTable
         [MaxLength(512)]
         public string Name { get; set; }
         [Required]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
         public DateTime Date { get; set; }
         [Required]
         public decimal Price { get; set; }
@@ -22,5 +25,8 @@ namespace CurrencyApp.Models.Application.ItemTable
         [Required]
         [MaxLength(3)] // For now it's always PLN
         public string CurrencyTo { get; set; }
+
+        public List<SelectListItem> CurrenciesFrom { get; set; } = new List<SelectListItem>();
+        public List<SelectListItem> CurrenciesTo { get; set; } = new List<SelectListItem>();
     }
 }

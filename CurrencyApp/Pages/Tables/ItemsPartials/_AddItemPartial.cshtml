@@ -1,43 +1,62 @@
 ﻿@model CurrencyApp.Models.Application.ItemTable.ItemAddModel
 
-<hr />
-<div class="row">
-    <div class="col-12">
-        <form asp-action="_AddItemPartial">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" />
-                <span asp-validation-for="Date" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CurrencyFrom" class="control-label"></label>
-                <input asp-for="CurrencyFrom" class="form-control" />
-                <span asp-validation-for="CurrencyFrom" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CurrencyTo" class="control-label"></label>
-                <input asp-for="CurrencyTo" class="form-control" />
-                <span asp-validation-for="CurrencyTo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+<h4>Dodaj Przedmiot</h4>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<form asp-page-handler="AddItem" method="post">
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th style="width: 45%" class="text-center">Nazwa</th>
+                <th style="width: 5%" class="text-center">Data</th>
+                <th style="width: 13%" class="text-center">Cena</th>
+                <th style="width: 13%" class="text-center">Waluta</th>
+                <th style="width: 13%" class="text-center">Waluta docelowa</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <input asp-for="Name" class="form-control" />
+                </td>
+                <td>
+                    <input asp-for="Date" value="@DateTime.Now.ToString("yyyy-MM-dd")" class="form-control" />
+                </td>
+                <td>
+                    <input asp-for="Price" class="form-control" />
+                </td>
+                <td>
+                    <select asp-for="CurrencyFrom" asp-items="Model.CurrenciesFrom" class="form-control"></select>
+                </td>
+                <td>
+                    <select asp-for="CurrencyTo" asp-items="Model.CurrenciesTo" class="form-control"></select>
+                </td>
+                <td>
+                    <button asp-page-handler="AddItem" class="btn btn-info "><b>+</b></button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </td>
+                <td>
+                    <span asp-validation-for="Date" class="text-danger"></span>
+                </td>
+                <td>
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </td>
+                <td>
+                    <span asp-validation-for="CurrencyFrom" class="text-danger"></span>
+                </td>
+                <td>
+                    <span asp-validation-for="CurrencyTo" class="text-danger"></span>
+                </td>
+                <td>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+
 

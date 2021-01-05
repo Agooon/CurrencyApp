@@ -52,7 +52,7 @@ namespace CurrencyApp.Pages.Account
             public bool RememberMe { get; set; }
         }
 
-        public async Task OnGetAsync(string returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(string returnUrl = null)
         {
             if (!string.IsNullOrEmpty(ErrorMessage))
             {
@@ -67,6 +67,10 @@ namespace CurrencyApp.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             ReturnUrl = returnUrl;
+
+            // For testing puropses
+            await _signInManager.PasswordSignInAsync("BasicUser", "User123", true, lockoutOnFailure: false);
+            return LocalRedirect(returnUrl);
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)

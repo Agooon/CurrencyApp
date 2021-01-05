@@ -56,7 +56,7 @@ namespace CurrencyApp
             });
 
             services.AddRazorPages().AddRazorRuntimeCompilation()
-                .AddRazorPagesOptions(config => {
+                .AddRazorPagesOptions(config => { 
                     config.Conventions.AuthorizeFolder("/");
                     config.Conventions.AuthorizeFolder("/Admin", "RequireAdministratorRole");
                     //config.Conventions.AuthorizeFolder("/AdminPanel","RequireAdministratorRole");

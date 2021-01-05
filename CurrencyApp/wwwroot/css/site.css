@@ -4,7 +4,6 @@ for details on configuring this project to bundle and minify static web assets. 
 a.navbar-brand {
     white-space: normal;
     text-align: center;
-    word-break: break-all;
 }
 
 /* Provide sufficient contrast against white background */
@@ -59,7 +58,6 @@ html {
     position: relative;
     min-height: 100%;
 }
-
 body {
     /* Margin bottom by footer height */
     margin-bottom: 60px;
@@ -104,4 +102,12 @@ body {
 }
 .displayNone{
     display:none;
+}
+@media(max-width:960px){
+    td{
+        font-size:14px;
+    }
+    a.navbar-brand {
+        font-size: 15px;
+    }
 }
