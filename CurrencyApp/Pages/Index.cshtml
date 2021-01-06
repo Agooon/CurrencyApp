@@ -2,7 +2,7 @@
 
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Witaj w CurrencyApp!";
 }
 <div class="container">
     @if (!string.IsNullOrWhiteSpace(Model.ErrorString) || Model.TableA == null)
@@ -16,7 +16,7 @@
     {
 
         <div class="text-center m-md-3">
-            <h2>Tabela kursów waluts z dnia @Model.TableA.EffectiveDate</h2>
+            <h2 class="text-primary">Tabela kursów waluts z dnia @Model.TableA.EffectiveDate</h2>
             @if (Model.Date != "" && Model.Date != @Model.TableA.EffectiveDate)
             {
                 <h5 class="text-danger">Nie znaleziono tabeli z dnia: @Model.Date</h5>

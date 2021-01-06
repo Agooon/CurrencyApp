@@ -6,18 +6,44 @@
     ViewData["Title"] = "Lista przedmiotów";
 }
 @Html.AntiForgeryToken()
-<form method="post">
+<form method="post" class="container-fluid">
 
-    <div class="row align-items-start"> 
-        @* Left Form *@
-        <div class="row col-md-12 col-lg-3 pb-3">
-            <div class="col-md-6 col-lg-12 pb-1 border-dark border">
+    <div class="row align-items-start">
+        <div class="text-center col-12 mb-2">
+            <a class="btn btn-dark pb-2 text-primary" asp-page="Items"><span class="h2">Strona Główna</span></a>
+        </div>
+
+
+        @* Center table *@
+        <div class="col-lg-12 col-xl-9 mr-2">
+            @* For adding an item*@
+            @await Html.PartialAsync("~/Pages/Tables/ItemsPartials/_AddItemPartial.cshtml", Model.AddItemModel)
+            @if (!string.IsNullOrWhiteSpace(Model.ErrorString))
+            {
+                <div class="h3 alert-danger bg-darker text-center">@Html.Raw(Model.ErrorString)</div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.Messages))
+            {
+                <div class="h3 text-info bg-darker text-center">@Html.Raw(Model.Messages)</div>
+            }
+            <br />
+            @* For adding an Table *@
+            @await Html.PartialAsync("~/Pages/Tables/ItemsPartials/_ItemTablePartial.cshtml", Model)
+
+        </div>
+
+        @* Right Form *@
+        <div class="bg-darker row col-lg-12 col-xl-3">
+            <div class="text-center col-12 pb-2 pt-1">
+                <span class="h3 text-primary">Pasek Narzędzi</span>
+            </div>
+            <div class="col-md-6 col-xl-12 p-2 text-primary">
                 @await Html.PartialAsync("~/Pages/Tables/ItemsPartials/_CheckBoxesItPartial.cshtml", Model)
             </div>
-            <div class="col-md-6 col-lg-12 pb-1 border-dark border">
+            <div class="col-md-6 col-xl-12 p-2">
                 @await Html.PartialAsync("~/Pages/Tables/ItemsPartials/_ExcelPartial.cshtml", Model)
             </div>
-            <div class="col-12 pb-1 border-dark border">
+            <div class="col-12 pb-1 p-2">
                 @await Html.PartialAsync("~/Pages/Tables/ItemsPartials/_ButtonsPartial.cshtml", Model)
             </div>
             <div>
@@ -25,23 +51,6 @@
             </div>
         </div>
 
-        @* Center table *@
-        <div class="col-md-12 col-lg-9">
-            @* For adding an item*@
-            @await Html.PartialAsync("~/Pages/Tables/ItemsPartials/_AddItemPartial.cshtml", Model.AddItemModel)
-            @if (!string.IsNullOrWhiteSpace(Model.ErrorString))
-            {
-                <div class="h3 alert-danger text-center">@Html.Raw(Model.ErrorString)</div>
-            }
-            @if (!string.IsNullOrWhiteSpace(Model.Messages))
-            {
-                <div class="h3 alert-info text-center">@Html.Raw(Model.Messages)</div>
-            }
-            <br />
-            @* For adding an Table *@
-            @await Html.PartialAsync("~/Pages/Tables/ItemsPartials/_ItemTablePartial.cshtml", Model)
-
-        </div>
     </div>
 
 </form>
@@ -70,7 +79,13 @@
                 //    });
             });
             $("body").on("click", "button.delete", function () {
-                if (!confirm("Potwierdź usnięcie przedmiotu!"))
+                if ($(this).hasClass("deleteALL")) {
+                    if (!confirm("Potwierdź usnięcie wszystkich przedmiotów!"))
+                        return false;
+                    else if (!confirm("Od tej operacji nie ma odwrotu!(x2)"))
+                        return false;
+                }
+                else if (!confirm("Potwierdź usnięcie przedmiotu!"))
                     return false;
             });
 

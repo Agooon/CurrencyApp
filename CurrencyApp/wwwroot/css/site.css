@@ -73,12 +73,13 @@ body {
 
 /* My CSS*/
 .listHover:hover {
-    background: #ccc;
+    background: #222;
     cursor: pointer;
+    color: #00e0ff;
 }
 
 .highLight {
-    background: #ccc;
+    background: #aaa;
     cursor: pointer;
 }
 
@@ -87,15 +88,15 @@ body {
 }
 
 .tableTextColor {
-    color: #ddd;
+    color: #eee;
 }
 
     .tableTextColor:hover {
-        color: #fff;
+        color: #2497fa;
     }
 
 .bgDangerColorNH {
-    background: rgba(232, 47, 47, 0.6)
+    background: rgba(222, 63, 63, 0.60)
 }
 .clickable{
     cursor:pointer;
@@ -103,9 +104,32 @@ body {
 .displayNone{
     display:none;
 }
+.bg-gray{
+    background:#333;
+}
+
+a.bg-gray:hover, a.bg-gray:focus,
+button.bg-gray:hover,
+button.bg-gray:focus, input.bg-gray:focus {
+    background-color: #333 !important;
+}
+
+.bg-darker {
+    background: #222;
+}
+
+a.bg-darker:hover, a.bg-darker:focus,
+button.bg-darker:hover,
+button.bg-darker:focus, input.bg-darker:focus,
+select.bg-darker:focus {
+    background-color: #222 !important;
+}
+
+
+/*To keep the table form word breaking*/
 @media(max-width:960px){
     td{
-        font-size:14px;
+        font-size:13px;
     }
     a.navbar-brand {
         font-size: 15px;

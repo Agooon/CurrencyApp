@@ -1,15 +1,17 @@
-using CurrencyAppDatabase.Initialization;
 using CurrencyAppDatabase.DataAccess;
+using CurrencyAppDatabase.Initialization;
 using CurrencyAppDatabase.Models.CurrencyApp;
 using CurrencyAppDatabase.Models.Identity;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Identity;
 using System;
+using System.Globalization;
+using System.IO;
 
 namespace CurrencyApp
 {
@@ -43,8 +45,7 @@ namespace CurrencyApp
             {
                 // Cookie settings
                 options.Cookie.HttpOnly = true;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-
+                options.ExpireTimeSpan = TimeSpan.FromDays(30);
                 options.LoginPath = "/Account/Login";
                 options.AccessDeniedPath = "/Account/AccessDenied";
                 options.SlidingExpiration = true;
@@ -102,11 +103,19 @@ namespace CurrencyApp
                 endpoints.MapRazorPages();
             });
 
+            // Setting correct culture
+            var cultureInfo = new CultureInfo("pl-PL");
+            
+
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
             // Setting up initialization of  database
             SetupDatabase.InitializeDatabase(serviceProvider,
                                 Configuration.GetSection("AdminSettings").Get<string[]>(),
                                 Configuration.GetSection("RoleList").Get<string[]>()
                                 ).Wait();
+
         }
     }
 }

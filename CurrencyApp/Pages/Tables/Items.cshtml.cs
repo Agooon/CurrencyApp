@@ -60,6 +60,11 @@ namespace CurrencyApp.Pages
         // AddItem Model
         [BindProperty]
         public ItemAddModel AddItemModel { get; set; } = new ItemAddModel();
+        // From and To excel strings
+        [BindProperty]
+        public string FromExcel { get; set; }
+        [TempData]
+        public string ToExcel { get; set; }
         public ItemsModel(IHttpClientFactory clientFactory, IConfiguration iConfig, CurrencyContext context)
         {
             _clientFactory = clientFactory;
@@ -75,11 +80,8 @@ namespace CurrencyApp.Pages
         // To get list of items
         public async Task OnGetAsync()
         {
-            foreach (string currency in _configuration.GetSection("Currencies").Get<string[]>().Where(x => x != "PLN"))
-            {
-                AddItemModel.CurrenciesFrom.Add(new SelectListItem { Value = currency, Text = currency });
-            }
-            AddItemModel.CurrenciesTo.Add(new SelectListItem { Value = "PLN", Text = "PLN" });
+            // Setting currencies
+            SetCurrencies();
             if (User.IsInRole("Admin"))
             {
                 TempData["BigErrorString"] = "Jako admin nie mo¿esz posiadaæ w³asnej tabeli";
@@ -90,9 +92,9 @@ namespace CurrencyApp.Pages
         }
 
         // To sort list of items
-        public async Task TaskOnGetSortAsync(string sortOption = "")
+        public async Task OnGetSortAsync(string sortOption = "")
         {
-            // Getting Data from Database !!! TO-DO !!!
+            // Getting Data from Database
             TableI = await SetItemsAsync();
             if (TableI == null)
             {
@@ -108,6 +110,8 @@ namespace CurrencyApp.Pages
 
             // Getting Data from Database !!! TO-DO !!!
             SetCheckboxes();
+            // Setting currencies
+            SetCurrencies();
 
             if (TableI.Items == null || TableI.Items.Count == 0)
                 return;
@@ -152,6 +156,7 @@ namespace CurrencyApp.Pages
             DateTableCheck = checkBoxes[6];
             CurrencyTCheck = checkBoxes[7];
         }
+
         // To save selected checkboxes
         public void SaveCheckBoxes()
         {
@@ -167,7 +172,7 @@ namespace CurrencyApp.Pages
             // Setting the values of checkboxes, async
             CookieOptions options = new CookieOptions()
             {
-                Expires = DateTime.MaxValue
+                Expires = DateTimeOffset.MaxValue
             };
             string itemsString = JsonConvert.SerializeObject(checkBoxes);
             Response.Cookies.Append("CheckboxesCookie", itemsString, options);
@@ -222,6 +227,13 @@ namespace CurrencyApp.Pages
         public async Task<IActionResult> OnPostAddItemAsync()
         {
             await ChangePosAsync(Ids);
+            if (!ModelState.IsValid)
+            {
+                // Setting currencies
+                SetCurrencies();
+                return Page();
+            }
+
             // call to API http://api.nbp.pl/api/exchangerates/rates/{table}/code}/{date}/
 
             // date = RRRR-MM-DD
@@ -268,22 +280,10 @@ namespace CurrencyApp.Pages
             await TableOperations.AddItemToItemTable(_context, TableI, newItem);
             Messages = "Dodano nowy przedmiot!";
             if (newItem.Date != newItem.DateTable)
-                Messages += "</br>Data transakcji <b>" + newItem.Date.ToString("yyyy-MM-dd")+ "</b> jest inna od daty tabeli <b>" + newItem.DateTable.ToString("yyyy-MM-dd") + "</b>";
+                Messages += "</br>Data transakcji <b>" + newItem.Date.ToString("yyyy-MM-dd") + "</b> jest inna od daty tabeli <b>" + newItem.DateTable.ToString("yyyy-MM-dd") + "</b>";
             return RedirectToPage();
         }
-        private async Task<SingleRateModel> GetCorrectCall(HttpClient client, string code, string date)
-        {
-            try
-            {
-                return await client.GetFromJsonAsync<SingleRateModel>($"rates/A/{code}/{date}?format=json");
-            }
-            catch (Exception ex)
-            {
-                ErrorString = $"Error has accured:</br>{ex.Message}</br>";
-                return null;
-            }
 
-        }
         // To delete an item
         public async Task<IActionResult> OnPostDeleteItemAsync(int number)
         {
@@ -296,9 +296,21 @@ namespace CurrencyApp.Pages
             return RedirectToPage();
             // Adding item to database
         }
+
+        // To delete all items
+        public async Task<IActionResult> OnPostDeleteAllItemsAsync()
+        {
+            TableI = await SetItemsAsync();
+            _context.Items.RemoveRange(TableI.Items);
+
+            await _context.SaveChangesAsync();
+            return RedirectToPage();
+            // Adding item to database
+        }
         // To save a changes in position of list to database
         public async Task<IActionResult> OnPostSaveChangesAsync()
         {
+
             // Jest to wywo³ywane przy 
             await ChangePosAsync(Ids);
             SaveCheckBoxes();
@@ -308,18 +320,171 @@ namespace CurrencyApp.Pages
 
 
         // On Post add items to database
-        public void OnPostImportTable(string tableString)
+        public async Task<IActionResult> OnPostImportTable()
         {
-            throw new NotImplementedException();
+            // Getting Data from Database
+            TableI = await SetItemsAsync();
+            ErrorString = "";
+            string correctness = StaticFunctions.IsStringOfItemTable(FromExcel);
+            if (correctness != "SUCCESS")
+            {
+                ErrorString = correctness;
+                return RedirectToPage();
+            }
+            List<Item> newItems = new List<Item>();
+
+            string[] rows = FromExcel.Split("\r\n");
+            List<string> addedItems = new List<string>();
+            var client = _clientFactory.CreateClient("nbp");
+            var maxNumberOfCalls = _configuration.GetValue<int>("MaxNumberOfCalls");
+            foreach (var row in rows.Skip(1))
+            {
+
+                string[] words = row.Split("\t");
+                // call to API http://api.nbp.pl/api/exchangerates/rates/{table}/code}/{date}/
+
+                // date = RRRR-MM-DD
+
+                var date = DateTime.Parse(words[1]).ToString("yyyy-MM-dd");
+
+                var call = await GetCorrectCallNOERROR(client, words[3], date);
+                string errString = "";
+                int counter = 0;
+                while (call == null && counter < maxNumberOfCalls)
+                {
+                    errString += "</br>" + date;
+                    StaticFunctions.PreviousDay(ref date, "yyyy-MM-dd");
+                    errString += "</br>" + date + "</br>";
+                    call = await GetCorrectCallNOERROR(client, words[3], date);
+                    counter++;
+                }
+                if (call == null)
+                {
+                    errString += "Nie uda³o siê dodaæ przedmiotu <b>" + words[0] + "</b>. B³¹d przy wysy³aniu zapytania </br>";
+                }
+                else
+                {
+                    errString = null;
+                }
+                if (!string.IsNullOrWhiteSpace(errString))
+                    ErrorString += errString;
+                else
+                {
+                    // Creating new Item
+                    Item newItem = new Item()
+                    {
+                        Name = words[0],
+                        Date = DateTime.Parse(words[1]),
+                        Price = decimal.Parse(words[2]),
+                        CurrencyFrom = words[3],
+                        Rate = (decimal)call.Rates[0].Mid,
+                        DateTable = DateTime.Parse(call.Rates[0].EffectiveDate),
+                        ConvertedPrice = (decimal)call.Rates[0].Mid * decimal.Parse(words[2]),
+                        CurrencyTo = "PLN" // For now all of currencies will be converted into
+                    };
+                    // Adding item to database
+                    await TableOperations.AddItemToItemTable(_context, TableI, newItem);
+                    addedItems.Add(words[0]);
+                }
+                await _context.SaveChangesAsync();
+            }
+            Messages = "Koniec dodawania przedmiotów, dodano:";
+            foreach (var itemS in addedItems)
+            {
+                Messages += "</br>" + itemS;
+            }
+            return RedirectToPage();
         }
         //To get list to outuput excel - \t as a separator of columns \n as separator of rows
         //  colname1    colname2    colname3    ...
         //  val11       val12       val13       ...
         //  val21       val22       val23       ...
         //  ...         ...         ...
-        public void OnGetExportTable()
+        public async Task<IActionResult> OnPostExportTable()
         {
-            throw new NotImplementedException();
+            await ChangePosAsync(Ids);
+            SaveCheckBoxes();
+            ToExcel = "";
+
+            if (!NameCheck)
+                ToExcel += "Nazwa\t";
+            if (!DateCheck)
+                ToExcel += "Data\t";
+            if (!PriceCheck)
+                ToExcel += "Cena\t";
+            if (!CurrencyFCheck)
+                ToExcel += "Waluta\t";
+            if (!RateCheck)
+                ToExcel += "Kurs\t";
+            if (!PriceConCheck)
+                ToExcel += "Cena po przeliczeniu\t";
+            if (!DateTableCheck)
+                ToExcel += "Data tabeli\t";
+            if (!CurrencyTCheck)
+                ToExcel += "Waluta docelowa\t";
+
+            ToExcel += "\n";
+
+            foreach (var item in TableI.Items)
+            {
+                if (!NameCheck)
+                    ToExcel += item.Name + "\t";
+                if (!DateCheck)
+                    ToExcel += item.Date.ToString("yyyy-MM-dd") + "\t";
+                if (!PriceCheck)
+                    ToExcel += item.Price + "\t";
+                if (!CurrencyFCheck)
+                    ToExcel += item.CurrencyFrom + "\t";
+                if (!RateCheck)
+                    ToExcel += item.Rate.ToString().Replace(".", ",") + "\t";
+                if (!PriceConCheck)
+                    ToExcel += item.ConvertedPrice + "\t";
+                if (!DateTableCheck)
+                    ToExcel += item.DateTable.ToString("yyyy-MM-dd") + "\t";
+                if (!CurrencyTCheck)
+                    ToExcel += item.CurrencyTo + "\t";
+                ToExcel += "\n";
+            }
+            ModelState.Clear();
+            return RedirectToPage();
+        }
+
+
+
+        // Private methods to clarify code
+        private void SetCurrencies()
+        {
+            foreach (string currency in _configuration.GetSection("Currencies").Get<string[]>().Where(x => x != "PLN"))
+            {
+                AddItemModel.CurrenciesFrom.Add(new SelectListItem { Value = currency, Text = currency });
+            }
+            AddItemModel.CurrenciesTo.Add(new SelectListItem { Value = "PLN", Text = "PLN" });
+        }
+
+        private async Task<SingleRateModel> GetCorrectCall(HttpClient client, string code, string date)
+        {
+            try
+            {
+                return await client.GetFromJsonAsync<SingleRateModel>($"rates/A/{code}/{date}?format=json");
+            }
+            catch (Exception ex)
+            {
+                ErrorString = $"Error has accured:</br>{ex.Message}</br>";
+                return null;
+            }
+        }
+
+        private async Task<SingleRateModel> GetCorrectCallNOERROR(HttpClient client, string code, string date)
+        {
+            try
+            {
+                return await client.GetFromJsonAsync<SingleRateModel>($"rates/A/{code}/{date}?format=json");
+            }
+            catch (Exception ex)
+            {
+                ErrorString += $"rates/A/{code}/{date}?format=json";
+                return null;
+            }
         }
     }
 }

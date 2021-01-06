@@ -4,37 +4,39 @@
     <thead class="thead-dark">
         <tr>
             <th style="width: 12%" id="nameH" class="text-center"><a class="navbar-brand tableTextColor" asp-page-handler="Sort" asp-route-sortOption="@Model.SortName">Nazwa</a></th>
-            <th style="width: 13%" id="dateH" class="text-center"><a class="navbar-brand tableTextColor" asp-page-handler="Sort" asp-route-sortOption="@Model.SortDate">Data</a></th>
-            <th style="width: 12%" id="priceH" class="text-center"><a class="navbar-brand tableTextColor" asp-page-handler="Sort" asp-route-sortOption="@Model.SortPrice">Cena</a></th>
+            <th style="width: 21%" id="dateH" class="text-center"><a class="navbar-brand tableTextColor" asp-page-handler="Sort" asp-route-sortOption="@Model.SortDate">Data</a></th>
+            <th style="width: 10%" id="priceH" class="text-center"><a class="navbar-brand tableTextColor" asp-page-handler="Sort" asp-route-sortOption="@Model.SortPrice">Cena</a></th>
             <th id="currencyFH" class="text-center"><a class="navbar-brand tableTextColor" asp-page-handler="Sort" asp-route-sortOption="@Model.SortCurrency">Waluta</a></th>
-            <th style="width: 12%" id="rateH" class="text-center"><a class="navbar-brand tableTextColor" asp-page-handler="Sort" asp-route-sortOption="@Model.SortRate">Kurs</a></th>
-            <th style="width: 12%" id="priceCH" class="text-center"><a class="navbar-brand tableTextColorNH">Cena po przeliczeniu</a></th>
-            <th style="width: 13%" id="dateTH" class="text-center"><a class="navbar-brand tableTextColorNH">Data tabeli</a></th>
+            <th style="width: 10%" id="rateH" class="text-center"><a class="navbar-brand tableTextColor" asp-page-handler="Sort" asp-route-sortOption="@Model.SortRate">Kurs</a></th>
+            <th style="width: 10%" id="priceCH" class="text-center"><a class="navbar-brand tableTextColorNH">Cena po przeliczeniu</a></th>
+            <th style="width: 17%" id="dateTH" class="text-center"><a class="navbar-brand tableTextColorNH">Data tabeli</a></th>
             <th id="currencyTH" class="text-center"><a class="navbar-brand tableTextColorNH">Waluta docelowa</a></th>
-            <th></th>
+            <th>
+                <button asp-page-handler="DeleteAllItems" style="font-size:12px;" class="btn btn-danger delete deleteALL"><b>ALL</b></button>
+            </th>
         </tr>
     </thead>
-    <tbody id="sortable">
+    <tbody id="sortable" class="table-dark">
         @{int counter = 0; }
         @foreach (var item in Model.TableI.Items)
         {
             <tr id="item-@item.Position" class="listHover">
                 <input type="hidden" name="Ids" value="@item.Position" />
                 <td id="nameR" class="text-center nameR">@item.Name</td>
-                <td id="dateR" name="TableI.Items[@counter].Date" class="text-center dateR">@item.Date.ToString("yyyy-MM-dd")</td>
-                <td id="priceR" name="TableI.Items[@counter].Price" class="text-center priceR">@item.Price</td>
-                <td id="currencyFR" name="TableI.Items[@counter].CurrencyFrom" class="text-center currencyFR">@item.CurrencyFrom</td>
-                <td id="rateR" name="TableI.Items[@counter].Rate" class="text-center rateR">@item.Rate</td>
-                <td id="priceCR" name="TableI.Items[@counter].ConvertedPrice" class="text-center priceCR">@item.ConvertedPrice</td>
+                <td id="dateR" class="text-center dateR">@item.Date.ToString("yyyy-MM-dd")</td>
+                <td id="priceR" class="text-center priceR">@item.Price</td>
+                <td id="currencyFR" class="text-center currencyFR">@item.CurrencyFrom</td>
+                <td id="rateR" class="text-center rateR">@item.Rate</td>
+                <td id="priceCR" class="text-center priceCR">@item.ConvertedPrice</td>
                 @if (item.DateTable.Equals(item.Date))
                 {
-                    <td id="dateTR" name="TableI.Items[@counter].DateTable" class="text-center dateTR">@item.DateTable.ToString("yyyy-MM-dd")</td>
+                    <td id="dateTR" class="text-center dateTR">@item.DateTable.ToString("yyyy-MM-dd")</td>
                 }
                 else
                 {
-                    <td id="dateTR" name="TableI.Items[@counter].DateTable" class="bgDangerColorNH text-center dateTR">@item.DateTable.ToString("yyyy-MM-dd")</td>
+                    <td id="dateTR" class="bgDangerColorNH text-center dateTR">@item.DateTable.ToString("yyyy-MM-dd")</td>
                 }
-                <td id="currencyTR" name="TableI.Items[@counter].CurrencyTo" class="text-center currencyTR">@item.CurrencyTo</td>
+                <td id="currencyTR" class="text-center currencyTR">@item.CurrencyTo</td>
                 <td>
                     <button asp-page-handler="DeleteItem" asp-route-number=@counter class="btn btn-danger delete"><b>X</b></button>
                 </td>

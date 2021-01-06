@@ -1,9 +1,7 @@
 ﻿@model CurrencyApp.Models.Application.ItemTable.ItemAddModel
 
-<h4>Dodaj Przedmiot</h4>
-
 <form asp-page-handler="AddItem" method="post">
-    <table class="table">
+    <table class="table table-dark">
         <thead class="thead-dark">
             <tr>
                 <th style="width: 45%" class="text-center">Nazwa</th>
@@ -17,22 +15,22 @@
         <tbody>
             <tr>
                 <td>
-                    <input asp-for="Name" class="form-control" />
+                    <input asp-for="Name" style="border:0;" class="form-control bg-darker text-primary" />
                 </td>
                 <td>
-                    <input asp-for="Date" value="@DateTime.Now.ToString("yyyy-MM-dd")" class="form-control" />
+                    <input asp-for="Date" value="@DateTime.Now.ToString("yyyy-MM-dd")" style="border:0;" class="form-control bg-darker text-primary" />
                 </td>
                 <td>
-                    <input asp-for="Price" class="form-control" />
+                    <input asp-for="Price" style="border:0;" class="form-control bg-darker text-primary" />
                 </td>
                 <td>
-                    <select asp-for="CurrencyFrom" asp-items="Model.CurrenciesFrom" class="form-control"></select>
+                    <select asp-for="CurrencyFrom" asp-items="Model.CurrenciesFrom" style="border:0;" class="form-control bg-darker text-primary"></select>
                 </td>
                 <td>
-                    <select asp-for="CurrencyTo" asp-items="Model.CurrenciesTo" class="form-control"></select>
+                    <select asp-for="CurrencyTo" asp-items="Model.CurrenciesTo" style="border:0;" class="form-control bg-darker text-primary"></select>
                 </td>
                 <td>
-                    <button asp-page-handler="AddItem" class="btn btn-info "><b>+</b></button>
+                    <button asp-page-handler="AddItem" class="btn btn-primary"><b>+</b></button>
                 </td>
             </tr>
             <tr>
