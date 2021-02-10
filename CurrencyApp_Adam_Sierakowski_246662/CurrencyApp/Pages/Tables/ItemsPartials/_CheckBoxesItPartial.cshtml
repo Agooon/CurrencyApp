@@ -1,0 +1,52 @@
+﻿@model CurrencyApp.Pages.ItemsModel
+
+
+<div class="col-sm">
+    <label class="clickable">
+        <input asp-for="NameCheck" type="checkbox" name="NameCheck" />
+        1. Schowaj nazwy
+    </label>
+</div>
+<div class="col-sm">
+    <label class="clickable">
+        <input asp-for="DateCheck" type="checkbox" name="DateCheck" />
+        2. Schowaj datę
+    </label>
+</div>
+<div class="col-sm">
+    <label class="clickable">
+        <input asp-for="PriceCheck" type="checkbox" name="PriceCheck" />
+        3. Schowaj cenę
+    </label>
+</div>
+<div class="col-sm">
+    <label class="clickable">
+        <input asp-for="CurrencyFCheck" type="checkbox" name="CurrencyFCheck" />
+        4. Schowaj walutę
+    </label>
+</div>
+<div class="col-sm">
+    <label class="clickable">
+        <input asp-for="RateCheck" type="checkbox" name="RateCheck" />
+        5. Schowaj kursy
+    </label>
+</div>
+<div class="col-sm">
+    <label class="clickable">
+        <input asp-for="PriceConCheck" type="checkbox" name="PriceConCheck" />
+        6. Schowaj cenę po danym kursie
+    </label>
+</div>
+<div class="col-sm">
+    <label class="clickable">
+        <input asp-for="DateTableCheck" type="checkbox" name="DateTableCheck" />
+        7. Schowaj datę tabeli
+    </label>
+</div>
+<div class="col-sm pb-1">
+    <label class="clickable">
+        <input asp-for="CurrencyTCheck" type="checkbox" name="CurrencyTCheck" />
+        8. Schowaj walutę docelową
+    </label>
+</div>
+@*<button type="submit" class="btn btn-info" asp-page-handler="SaveChanges">Register</button>*@

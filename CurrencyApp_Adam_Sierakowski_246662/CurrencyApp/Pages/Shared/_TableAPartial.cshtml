@@ -1,0 +1,44 @@
+﻿@model IndexModel
+
+<table class="table table-striped table-dark">
+    <thead class="thead-dark">
+        <tr>
+            <th>Kod</th>
+            <th>Waluta</th>
+            <th>Wartość</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var rate in Model.TableA.Rates)
+        {
+            if (Model.MainOnes.Contains(rate.Code))
+            {
+                <tr class="mainOne rate">
+                    <td>@rate.Code</td>
+                    <td>@rate.Currency</td>
+                    <td>@rate.Mid</td>
+                </tr>
+            }
+            else
+            {
+                if (Model.MainOnesCK)
+                {
+                    <tr class="rate displayNone">
+                        <td>@rate.Code</td>
+                        <td>@rate.Currency</td>
+                        <td>@rate.Mid</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr class="rate">
+                        <td>@rate.Code</td>
+                        <td>@rate.Currency</td>
+                        <td>@rate.Mid</td>
+                    </tr>
+                }
+            }
+
+        }
+    </tbody>
+</table>

@@ -1,16 +1,15 @@
 using CurrencyApp.Backend;
+using CurrencyApp.Backend.Application.ItemTable;
 using CurrencyApp.Models.Application.ItemTable;
 using CurrencyAppDatabase.DataAccess;
 using CurrencyAppDatabase.DatabaseOperations;
 using CurrencyAppDatabase.Models.CurrencyApp;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,23 +29,12 @@ namespace CurrencyApp.Pages
         public string ErrorString { get; set; }
         [TempData]
         public string Messages { get; set; }
-        // Checkboxes
+
+        // Model for Checkboxes
+
         [BindProperty]
-        public bool NameCheck { get; set; } // 1
-        [BindProperty]
-        public bool DateCheck { get; set; } // 2
-        [BindProperty]
-        public bool PriceCheck { get; set; } // 3
-        [BindProperty]
-        public bool CurrencyFCheck { get; set; } // 4
-        [BindProperty]
-        public bool RateCheck { get; set; }// 5
-        [BindProperty]
-        public bool PriceConCheck { get; set; } // 6
-        [BindProperty]
-        public bool DateTableCheck { get; set; } // 7
-        [BindProperty]
-        public bool CurrencyTCheck { get; set; } // 8
+        public CheckBoxesViewModel Checkboxes { get; set; } = new CheckBoxesViewModel();
+
         // Sorting properties
         public string SortName { get; set; }
         public string SortDate { get; set; }
@@ -86,9 +74,12 @@ namespace CurrencyApp.Pages
             {
                 TempData["BigErrorString"] = "Jako admin nie mo¿esz posiadaæ w³asnej tabeli";
             }
-            TableI = await SetItemsAsync();
-            // Getting Data from Cookies 
-            SetCheckboxes();
+            else
+            {
+                TableI = await SetItemsAsync();
+                // Getting Data from Cookies 
+                CheckBoxesLogic.SetCheckboxes(Request, Checkboxes);
+            }
         }
 
         // To sort list of items
@@ -108,8 +99,8 @@ namespace CurrencyApp.Pages
             SortCurrency = sortOption == "currency" ? "currency_desc" : "currency";
             SortRate = sortOption == "rate_desc" ? "rate" : "rate_desc";
 
-            // Getting Data from Database !!! TO-DO !!!
-            SetCheckboxes();
+            // Getting Data from cookies
+            CheckBoxesLogic.SetCheckboxes(Request, Checkboxes);
             // Setting currencies
             SetCurrencies();
 
@@ -123,7 +114,7 @@ namespace CurrencyApp.Pages
             // For now the user can only have 1 Table, although Database is prepared for N-N relationship
             string username = User.Identity.Name;
             int userId = (await _context.Users.FirstOrDefaultAsync(x => x.UserName == username)).Id;
-            // Getting Data from Database !!! TO-DO !!!
+            // Getting Data from Database 
             int tableId = (await _context.UserTables.FirstOrDefaultAsync(x => x.UserId == userId)).TableId;
 
             var table = await _context.ItemTables.Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == tableId);
@@ -131,52 +122,7 @@ namespace CurrencyApp.Pages
 
             return table;
         }
-        public void SetCheckboxes()
-        {
-            // Geting checkboxes from cookies
-            if (Request.Cookies["CheckboxesCookie"] == null)
-            {
-                NameCheck = false;
-                DateCheck = false;
-                PriceCheck = false;
-                CurrencyFCheck = false;
-                RateCheck = false;
-                PriceConCheck = false;
-                DateTableCheck = false;
-                CurrencyTCheck = false;
-                return;
-            }
-            var checkBoxes = JsonConvert.DeserializeObject<bool[]>(Request.Cookies["CheckboxesCookie"]);
-            NameCheck = checkBoxes[0];
-            DateCheck = checkBoxes[1];
-            PriceCheck = checkBoxes[2];
-            CurrencyFCheck = checkBoxes[3];
-            RateCheck = checkBoxes[4];
-            PriceConCheck = checkBoxes[5];
-            DateTableCheck = checkBoxes[6];
-            CurrencyTCheck = checkBoxes[7];
-        }
 
-        // To save selected checkboxes
-        public void SaveCheckBoxes()
-        {
-            bool[] checkBoxes = new bool[8];
-            checkBoxes[0] = NameCheck;
-            checkBoxes[1] = DateCheck;
-            checkBoxes[2] = PriceCheck;
-            checkBoxes[3] = CurrencyFCheck;
-            checkBoxes[4] = RateCheck;
-            checkBoxes[5] = PriceConCheck;
-            checkBoxes[6] = DateTableCheck;
-            checkBoxes[7] = CurrencyTCheck;
-            // Setting the values of checkboxes, async
-            CookieOptions options = new CookieOptions()
-            {
-                Expires = DateTimeOffset.MaxValue
-            };
-            string itemsString = JsonConvert.SerializeObject(checkBoxes);
-            Response.Cookies.Append("CheckboxesCookie", itemsString, options);
-        }
         // To change places list of items
         public async Task ChangePosAsync(int[] ids)
         {
@@ -257,7 +203,7 @@ namespace CurrencyApp.Pages
             }
             if (call == null)
             {
-                ErrorString += "</br>Nie odnaleziono strony z tabelami lub przekroczono iloœæ zapytañ. SprawdŸ dzia³anie strony NBP.";
+                ErrorString = "</br>Nie odnaleziono strony z tabelami lub przekroczono iloœæ zapytañ. SprawdŸ dzia³anie strony NBP.";
                 return RedirectToPage();
             }
             else
@@ -313,11 +259,9 @@ namespace CurrencyApp.Pages
 
             // Jest to wywo³ywane przy 
             await ChangePosAsync(Ids);
-            SaveCheckBoxes();
+            CheckBoxesLogic.SaveCheckBoxes(Response, Checkboxes);
             return RedirectToPage();
         }
-
-
 
         // On Post add items to database
         public async Task<IActionResult> OnPostImportTable()
@@ -348,24 +292,18 @@ namespace CurrencyApp.Pages
                 var date = DateTime.Parse(words[1]).ToString("yyyy-MM-dd");
 
                 var call = await GetCorrectCallNOERROR(client, words[3], date);
-                string errString = "";
+                string errString;
                 int counter = 0;
                 while (call == null && counter < maxNumberOfCalls)
                 {
-                    errString += "</br>" + date;
                     StaticFunctions.PreviousDay(ref date, "yyyy-MM-dd");
-                    errString += "</br>" + date + "</br>";
                     call = await GetCorrectCallNOERROR(client, words[3], date);
                     counter++;
                 }
                 if (call == null)
-                {
-                    errString += "Nie uda³o siê dodaæ przedmiotu <b>" + words[0] + "</b>. B³¹d przy wysy³aniu zapytania </br>";
-                }
+                    errString = "Nie uda³o siê dodaæ przedmiotu <b>" + words[0] + "</b>. B³¹d przy wysy³aniu zapytania </br>";
                 else
-                {
                     errString = null;
-                }
                 if (!string.IsNullOrWhiteSpace(errString))
                     ErrorString += errString;
                 else
@@ -403,45 +341,45 @@ namespace CurrencyApp.Pages
         public async Task<IActionResult> OnPostExportTable()
         {
             await ChangePosAsync(Ids);
-            SaveCheckBoxes();
+            CheckBoxesLogic.SaveCheckBoxes(Response, Checkboxes);
             ToExcel = "";
 
-            if (!NameCheck)
+            if (!Checkboxes.NameCheck)
                 ToExcel += "Nazwa\t";
-            if (!DateCheck)
+            if (!Checkboxes.DateCheck)
                 ToExcel += "Data\t";
-            if (!PriceCheck)
+            if (!Checkboxes.PriceCheck)
                 ToExcel += "Cena\t";
-            if (!CurrencyFCheck)
+            if (!Checkboxes.CurrencyFCheck)
                 ToExcel += "Waluta\t";
-            if (!RateCheck)
+            if (!Checkboxes.RateCheck)
                 ToExcel += "Kurs\t";
-            if (!PriceConCheck)
+            if (!Checkboxes.PriceConCheck)
                 ToExcel += "Cena po przeliczeniu\t";
-            if (!DateTableCheck)
+            if (!Checkboxes.DateTableCheck)
                 ToExcel += "Data tabeli\t";
-            if (!CurrencyTCheck)
+            if (!Checkboxes.CurrencyTCheck)
                 ToExcel += "Waluta docelowa\t";
 
             ToExcel += "\n";
 
             foreach (var item in TableI.Items)
             {
-                if (!NameCheck)
+                if (!Checkboxes.NameCheck)
                     ToExcel += item.Name + "\t";
-                if (!DateCheck)
+                if (!Checkboxes.DateCheck)
                     ToExcel += item.Date.ToString("yyyy-MM-dd") + "\t";
-                if (!PriceCheck)
+                if (!Checkboxes.PriceCheck)
                     ToExcel += item.Price + "\t";
-                if (!CurrencyFCheck)
+                if (!Checkboxes.CurrencyFCheck)
                     ToExcel += item.CurrencyFrom + "\t";
-                if (!RateCheck)
+                if (!Checkboxes.RateCheck)
                     ToExcel += item.Rate.ToString().Replace(".", ",") + "\t";
-                if (!PriceConCheck)
+                if (!Checkboxes.PriceConCheck)
                     ToExcel += item.ConvertedPrice + "\t";
-                if (!DateTableCheck)
+                if (!Checkboxes.DateTableCheck)
                     ToExcel += item.DateTable.ToString("yyyy-MM-dd") + "\t";
-                if (!CurrencyTCheck)
+                if (!Checkboxes.CurrencyTCheck)
                     ToExcel += item.CurrencyTo + "\t";
                 ToExcel += "\n";
             }
@@ -480,9 +418,8 @@ namespace CurrencyApp.Pages
             {
                 return await client.GetFromJsonAsync<SingleRateModel>($"rates/A/{code}/{date}?format=json");
             }
-            catch (Exception ex)
+            catch
             {
-                ErrorString += $"rates/A/{code}/{date}?format=json";
                 return null;
             }
         }

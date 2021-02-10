@@ -3,49 +3,49 @@ $(function () {
 
     // Setup
     // 1
-    if ($("#NameCheck")[0].checked) {
+    if ($("#Checkboxes_NameCheck")[0].checked) {
         $("#nameH").addClass("displayNone");
         $(".nameR").addClass("displayNone");
     }
     // 2
-    if ($("#DateCheck")[0].checked) {
+    if ($("#Checkboxes_DateCheck")[0].checked) {
         $("#dateH").addClass("displayNone");
         $(".dateR").addClass("displayNone");
     }
     // 3
-    if ($("#PriceCheck")[0].checked) {
+    if ($("#Checkboxes_PriceCheck")[0].checked) {
         $("#priceH").addClass("displayNone");
         $(".priceR").addClass("displayNone");
     }
     // 4
-    if ($("#CurrencyFCheck")[0].checked) {
+    if ($("#Checkboxes_CurrencyFCheck")[0].checked) {
         $("#currencyFH").addClass("displayNone");
         $(".currencyFR").addClass("displayNone");
     }
     // 5
-    if ($("#RateCheck")[0].checked) {
+    if ($("#Checkboxes_RateCheck")[0].checked) {
         $("#rateH").addClass("displayNone");
         $(".rateR").addClass("displayNone");
     }
     // 6
-    if ($("#PriceConCheck")[0].checked) {
+    if ($("#Checkboxes_PriceConCheck")[0].checked) {
         $("#priceCH").addClass("displayNone");
         $(".priceCR").addClass("displayNone");
     }
     // 7
-    if ($("#DateTableCheck")[0].checked) {
+    if ($("#Checkboxes_DateTableCheck")[0].checked) {
         $("#dateTH").addClass("displayNone");
         $(".dateTR").addClass("displayNone");
     }
     // 8
-    if ($("#CurrencyTCheck")[0].checked) {
+    if ($("#Checkboxes_CurrencyTCheck")[0].checked) {
         $("#currencyTH").addClass("displayNone");
         $(".currencyTR").addClass("displayNone");
     }
 
     // For change event
 
-    $("#NameCheck").change(function () {
+    $("#Checkboxes_NameCheck").change(function () {
         if (this.checked) {
             $("#nameH").addClass("displayNone");
             $(".nameR").addClass("displayNone");
@@ -54,10 +54,10 @@ $(function () {
             $("#nameH").removeClass("displayNone");
             $(".nameR").removeClass("displayNone");
         }
-        $("#NameCheck").val(this.checked);
+        $("#Checkboxes_NameCheck").val(this.checked);
     });
 
-    $("#DateCheck").change(function () {
+    $("#Checkboxes_DateCheck").change(function () {
         if (this.checked) {
             $("#dateH").addClass("displayNone");
             $(".dateR").addClass("displayNone");
@@ -66,10 +66,10 @@ $(function () {
             $("#dateH").removeClass("displayNone");
             $(".dateR").removeClass("displayNone");
         }
-        $("#DateCheck").val(this.checked);
+        $("#Checkboxes_DateCheck").val(this.checked);
     });
 
-    $("#PriceCheck").change(function () {
+    $("#Checkboxes_PriceCheck").change(function () {
         if (this.checked) {
             $("#priceH").addClass("displayNone");
             $(".priceR").addClass("displayNone");
@@ -78,10 +78,10 @@ $(function () {
             $("#priceH").removeClass("displayNone");
             $(".priceR").removeClass("displayNone");
         }
-        $("#PriceCheck").val(this.checked);
+        $("#Checkboxes_PriceCheck").val(this.checked);
     });
 
-    $("#CurrencyFCheck").change(function () {
+    $("#Checkboxes_CurrencyFCheck").change(function () {
         if (this.checked) {
             $("#currencyFH").addClass("displayNone");
             $(".currencyFR").addClass("displayNone");
@@ -90,10 +90,10 @@ $(function () {
             $("#currencyFH").removeClass("displayNone");
             $(".currencyFR").removeClass("displayNone");
         }
-        $("#CurrencyFCheck").val(this.checked);
+        $("#Checkboxes_CurrencyFCheck").val(this.checked);
     });
 
-    $("#RateCheck").change(function () {
+    $("#Checkboxes_RateCheck").change(function () {
         if (this.checked) {
             $("#rateH").addClass("displayNone");
             $(".rateR").addClass("displayNone");
@@ -102,10 +102,10 @@ $(function () {
             $("#rateH").removeClass("displayNone");
             $(".rateR").removeClass("displayNone");
         }
-        $("#RateCheck").val(this.checked);
+        $("#Checkboxes_RateCheck").val(this.checked);
     });
 
-    $("#PriceConCheck").change(function () {
+    $("#Checkboxes_PriceConCheck").change(function () {
         if (this.checked) {
             $("#priceCH").addClass("displayNone");
             $(".priceCR").addClass("displayNone");
@@ -114,10 +114,10 @@ $(function () {
             $("#priceCH").removeClass("displayNone");
             $(".priceCR").removeClass("displayNone");
         }
-        $("#PriceConCheck").val(this.checked);
+        $("#Checkboxes_PriceConCheck").val(this.checked);
     });
 
-    $("#DateTableCheck").change(function () {
+    $("#Checkboxes_DateTableCheck").change(function () {
         if (this.checked) {
             $("#dateTH").addClass("displayNone");
             $(".dateTR").addClass("displayNone");
@@ -126,10 +126,10 @@ $(function () {
             $("#dateTH").removeClass("displayNone");
             $(".dateTR").removeClass("displayNone");
         }
-        $("#DateTableCheck").val(this.checked);
+        $("#Checkboxes_DateTableCheck").val(this.checked);
     });
 
-    $("#CurrencyTCheck").change(function () {
+    $("#Checkboxes_CurrencyTCheck").change(function () {
         if (this.checked) {
             $("#currencyTH").addClass("displayNone");
             $(".currencyTR").addClass("displayNone");
@@ -138,7 +138,7 @@ $(function () {
             $("#currencyTH").removeClass("displayNone");
             $(".currencyTR").removeClass("displayNone");
         }
-        $("#CurrencyTCheck").val(this.checked);
+        $("#Checkboxes_CurrencyTCheck").val(this.checked);
     });
 
 

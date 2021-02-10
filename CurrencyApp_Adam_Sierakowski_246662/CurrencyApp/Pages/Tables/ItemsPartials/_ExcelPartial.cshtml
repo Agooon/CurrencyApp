@@ -1,0 +1,14 @@
+﻿@model CurrencyApp.Pages.ItemsModel
+
+<div class="text-center p-2">
+    <div class="d-flex flex-column m-1">
+        <label class="h5 text-primary" asp-for="FromExcel">Wklej z excela</label>
+        <textarea class="bg-gray text-primary" style="resize:none;" rows="3" asp-for="FromExcel"></textarea>
+        <button asp-page-handler="ImportTable" class="btn btn-primary">Dodaj itemy z excela</button>
+    </div>
+    <div class="d-flex flex-column m-1">
+        <label class="h5 text-info" asp-for="ToExcel">Wklej do excela</label>
+        <textarea class="bg-gray text-info" style="resize:none;" rows="3" asp-for="ToExcel" readonly></textarea>
+        <button asp-page-handler="ExportTable" class=" btn btn-info">Przekształć tabelę do excela</button>
+    </div>
+</div>

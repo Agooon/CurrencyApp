@@ -1,0 +1,60 @@
+﻿@model CurrencyApp.Models.Application.ItemTable.ItemAddModel
+
+<form asp-page-handler="AddItem" method="post">
+    <table class="table table-dark">
+        <thead class="thead-dark">
+            <tr>
+                <th style="width: 45%" class="text-center">Nazwa</th>
+                <th style="width: 5%" class="text-center">Data</th>
+                <th style="width: 13%" class="text-center">Cena</th>
+                <th style="width: 13%" class="text-center">Waluta</th>
+                <th style="width: 13%" class="text-center">Waluta docelowa</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <input asp-for="Name" style="border:0;" class="form-control bg-darker text-primary" />
+                </td>
+                <td>
+                    <input asp-for="Date" value="@DateTime.Now.ToString("yyyy-MM-dd")" style="border:0;" class="form-control bg-darker text-primary" />
+                </td>
+                <td>
+                    <input asp-for="Price" style="border:0;" class="form-control bg-darker text-primary" />
+                </td>
+                <td>
+                    <select asp-for="CurrencyFrom" asp-items="Model.CurrenciesFrom" style="border:0;" class="form-control bg-darker text-primary"></select>
+                </td>
+                <td>
+                    <select asp-for="CurrencyTo" asp-items="Model.CurrenciesTo" style="border:0;" class="form-control bg-darker text-primary"></select>
+                </td>
+                <td>
+                    <button asp-page-handler="AddItem" class="btn btn-primary"><b>+</b></button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </td>
+                <td>
+                    <span asp-validation-for="Date" class="text-danger"></span>
+                </td>
+                <td>
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </td>
+                <td>
+                    <span asp-validation-for="CurrencyFrom" class="text-danger"></span>
+                </td>
+                <td>
+                    <span asp-validation-for="CurrencyTo" class="text-danger"></span>
+                </td>
+                <td>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+
+
