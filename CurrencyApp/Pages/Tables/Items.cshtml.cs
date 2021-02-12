@@ -1,5 +1,5 @@
 using CurrencyApp.Backend;
-using CurrencyApp.Backend.Application.ItemTable;
+using CurrencyApp.Backend.Application.ItemTableLogic;
 using CurrencyApp.Models.Application.ItemTable;
 using CurrencyAppDatabase.DataAccess;
 using CurrencyAppDatabase.DatabaseOperations;
@@ -251,13 +251,10 @@ namespace CurrencyApp.Pages
 
             await _context.SaveChangesAsync();
             return RedirectToPage();
-            // Adding item to database
         }
         // To save a changes in position of list to database
         public async Task<IActionResult> OnPostSaveChangesAsync()
         {
-
-            // Jest to wywo³ywane przy 
             await ChangePosAsync(Ids);
             CheckBoxesLogic.SaveCheckBoxes(Response, Checkboxes);
             return RedirectToPage();
@@ -275,115 +272,23 @@ namespace CurrencyApp.Pages
                 ErrorString = correctness;
                 return RedirectToPage();
             }
-            List<Item> newItems = new List<Item>();
 
-            string[] rows = FromExcel.Split("\r\n");
-            List<string> addedItems = new List<string>();
             var client = _clientFactory.CreateClient("nbp");
-            var maxNumberOfCalls = _configuration.GetValue<int>("MaxNumberOfCalls");
-            foreach (var row in rows.Skip(1))
-            {
+            int maxNumberOfCalls = _configuration.GetValue<int>("MaxNumberOfCalls");
 
-                string[] words = row.Split("\t");
-                // call to API http://api.nbp.pl/api/exchangerates/rates/{table}/code}/{date}/
+            var errMsg = await ExcelLogic.ImportTable(_context, client, TableI, maxNumberOfCalls, FromExcel);
 
-                // date = RRRR-MM-DD
+            ErrorString = errMsg.Item1;
+            Messages = errMsg.Item2;
 
-                var date = DateTime.Parse(words[1]).ToString("yyyy-MM-dd");
-
-                var call = await GetCorrectCallNOERROR(client, words[3], date);
-                string errString;
-                int counter = 0;
-                while (call == null && counter < maxNumberOfCalls)
-                {
-                    StaticFunctions.PreviousDay(ref date, "yyyy-MM-dd");
-                    call = await GetCorrectCallNOERROR(client, words[3], date);
-                    counter++;
-                }
-                if (call == null)
-                    errString = "Nie uda³o siê dodaæ przedmiotu <b>" + words[0] + "</b>. B³¹d przy wysy³aniu zapytania </br>";
-                else
-                    errString = null;
-                if (!string.IsNullOrWhiteSpace(errString))
-                    ErrorString += errString;
-                else
-                {
-                    // Creating new Item
-                    Item newItem = new Item()
-                    {
-                        Name = words[0],
-                        Date = DateTime.Parse(words[1]),
-                        Price = decimal.Parse(words[2]),
-                        CurrencyFrom = words[3],
-                        Rate = (decimal)call.Rates[0].Mid,
-                        DateTable = DateTime.Parse(call.Rates[0].EffectiveDate),
-                        ConvertedPrice = (decimal)call.Rates[0].Mid * decimal.Parse(words[2]),
-                        CurrencyTo = "PLN" // For now all of currencies will be converted into
-                    };
-                    // Adding item to database
-                    await TableOperations.AddItemToItemTable(_context, TableI, newItem);
-                    addedItems.Add(words[0]);
-                }
-                await _context.SaveChangesAsync();
-            }
-            Messages = "Koniec dodawania przedmiotów, dodano:";
-            foreach (var itemS in addedItems)
-            {
-                Messages += "</br>" + itemS;
-            }
             return RedirectToPage();
         }
-        //To get list to outuput excel - \t as a separator of columns \n as separator of rows
-        //  colname1    colname2    colname3    ...
-        //  val11       val12       val13       ...
-        //  val21       val22       val23       ...
-        //  ...         ...         ...
+
         public async Task<IActionResult> OnPostExportTable()
         {
             await ChangePosAsync(Ids);
             CheckBoxesLogic.SaveCheckBoxes(Response, Checkboxes);
-            ToExcel = "";
-
-            if (!Checkboxes.NameCheck)
-                ToExcel += "Nazwa\t";
-            if (!Checkboxes.DateCheck)
-                ToExcel += "Data\t";
-            if (!Checkboxes.PriceCheck)
-                ToExcel += "Cena\t";
-            if (!Checkboxes.CurrencyFCheck)
-                ToExcel += "Waluta\t";
-            if (!Checkboxes.RateCheck)
-                ToExcel += "Kurs\t";
-            if (!Checkboxes.PriceConCheck)
-                ToExcel += "Cena po przeliczeniu\t";
-            if (!Checkboxes.DateTableCheck)
-                ToExcel += "Data tabeli\t";
-            if (!Checkboxes.CurrencyTCheck)
-                ToExcel += "Waluta docelowa\t";
-
-            ToExcel += "\n";
-
-            foreach (var item in TableI.Items)
-            {
-                if (!Checkboxes.NameCheck)
-                    ToExcel += item.Name + "\t";
-                if (!Checkboxes.DateCheck)
-                    ToExcel += item.Date.ToString("yyyy-MM-dd") + "\t";
-                if (!Checkboxes.PriceCheck)
-                    ToExcel += item.Price + "\t";
-                if (!Checkboxes.CurrencyFCheck)
-                    ToExcel += item.CurrencyFrom + "\t";
-                if (!Checkboxes.RateCheck)
-                    ToExcel += item.Rate.ToString().Replace(".", ",") + "\t";
-                if (!Checkboxes.PriceConCheck)
-                    ToExcel += item.ConvertedPrice + "\t";
-                if (!Checkboxes.DateTableCheck)
-                    ToExcel += item.DateTable.ToString("yyyy-MM-dd") + "\t";
-                if (!Checkboxes.CurrencyTCheck)
-                    ToExcel += item.CurrencyTo + "\t";
-                ToExcel += "\n";
-            }
-            ModelState.Clear();
+            ToExcel = ExcelLogic.ExportTable(Response, Checkboxes, TableI);
             return RedirectToPage();
         }
 

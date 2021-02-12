@@ -28,7 +28,7 @@
                 <td id="currencyFR" class="text-center currencyFR">@item.CurrencyFrom</td>
                 <td id="rateR" class="text-center rateR">@item.Rate</td>
                 <td id="priceCR" class="text-center priceCR">@item.ConvertedPrice</td>
-                @if (item.DateTable.Equals(item.Date))
+                @if (item.DateTable.Equals(item.Date.AddDays(-1)))
                 {
                     <td id="dateTR" class="text-center dateTR">@item.DateTable.ToString("yyyy-MM-dd")</td>
                 }

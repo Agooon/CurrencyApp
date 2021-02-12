@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CurrencyApp.Backend.Application.ItemTable
+namespace CurrencyApp.Backend.Application.ItemTableLogic
 {
     public static class CheckBoxesLogic
     {
