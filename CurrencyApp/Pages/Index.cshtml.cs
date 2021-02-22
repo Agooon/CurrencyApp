@@ -54,7 +54,7 @@ namespace CurrencyApp.Pages
             var client = _clientFactory.CreateClient("nbp");
             Date = date;
 
-            if (date != "" && !StaticFunctions.IsValidDate(date, "yyyy-MM-dd"))
+            if (date != "" && !UtilFunctions.IsValidDate(date, "yyyy-MM-dd"))
             {
                 ErrorString = "Nieprawidłowy format daty, należy podać format: RRRR-MM-DD (np. 2020-11-20)";
                 return;
@@ -62,7 +62,7 @@ namespace CurrencyApp.Pages
             var call = await GetCorrectCall(client, date);
             while (call == null && counter < maxNumberOfCalls)
             {
-                StaticFunctions.PreviousDay(ref date, "yyyy-MM-dd");
+                UtilFunctions.PreviousDay(ref date, "yyyy-MM-dd");
                 call = await GetCorrectCall(client, date);
                 counter++;
             }

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace CurrencyApp.Backend
 {
-    public static class StaticFunctions
+    public static class UtilFunctions
     {
         public static bool IsValidDate(string value, string dateFormat)
         {

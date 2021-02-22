@@ -65,6 +65,11 @@ namespace CurrencyApp.Pages
             SortCurrency = "currency";
             SortRate = "rate";
         }
+
+        //
+        // GET FUNCTIONS
+        //
+
         // To get list of items
         public async Task OnGetAsync()
         {
@@ -109,65 +114,10 @@ namespace CurrencyApp.Pages
             if (!string.IsNullOrWhiteSpace(sortOption))
                 TableI.Items = TableOperations.ItemSort(TableI.Items, sortOption);
         }
-        public async Task<ItemTable> SetItemsAsync()
-        {
-            // For now the user can only have 1 Table, although Database is prepared for N-N relationship
-            string username = User.Identity.Name;
-            int userId = (await _context.Users.FirstOrDefaultAsync(x => x.UserName == username)).Id;
-            // Getting Data from Database 
-            int tableId = (await _context.UserTables.FirstOrDefaultAsync(x => x.UserId == userId)).TableId;
-
-            var table = await _context.ItemTables.Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == tableId);
-            table.Items = table.Items.OrderBy(x => x.Position).ToList();
-
-            return table;
-        }
-
-        // To change places list of items
-        public async Task ChangePosAsync(int[] ids)
-        {
-            if (StaticFunctions.IsSorted(ids))
-            {
-                TableI = await SetItemsAsync();
-                return;
-            }
-            var table = await SetItemsAsync();
-            int counter = 0;
-            List<Item> items = table.Items.ToList(); // To use indexes I have to cast ICollection to List
-            foreach (var id in ids)
-            {
-                items[id].Position = counter++;
-            }
-            table.Items = items;
-            table.Items = table.Items.OrderBy(x => x.Position).ToList();
-            await _context.SaveChangesAsync();
-            TableI = table;
-        }
-        // To change places list of items
-        public async Task ChangePosWithoutAsync(int[] ids, int position)
-        {
-            int counter = 0;
-            if (StaticFunctions.IsSorted(ids))
-            {
-                TableI = await SetItemsAsync();
-                foreach (var item in TableI.Items)
-                {
-                    if (item.Position != position)
-                        item.Position = counter++;
-                }
-                return;
-            }
-            var table = await SetItemsAsync();
-            List<Item> items = table.Items.ToList(); // To use indexes I have to cast ICollection to List
-            foreach (var id in ids)
-            {
-                if (items[id].Position != position)
-                    items[id].Position = counter++;
-            }
-            table.Items = items;
-            table.Items = table.Items.OrderBy(x => x.Position).ToList();
-            TableI = table;
-        }
+        
+        //
+        // POST FUNCTIONS
+        //
 
         // To add an item
         public async Task<IActionResult> OnPostAddItemAsync()
@@ -185,48 +135,12 @@ namespace CurrencyApp.Pages
             // date = RRRR-MM-DD
             var maxNumberOfCalls = _configuration.GetValue<int>("MaxNumberOfCalls");
             var client = _clientFactory.CreateClient("nbp");
-            var date = AddItemModel.Date.ToString("yyyy-MM-dd");
 
-            if (date != "" && !StaticFunctions.IsValidDate(date, "yyyy-MM-dd"))
-            {
-                ErrorString = "Nieprawid³owy format daty, nale¿y podaæ format: RRRR-MM-DD (np. 2020-11-20)";
-                return RedirectToPage();
-            }
+            var errMsg = await ItemLogic.AddItemAsync(_context, client, TableI, maxNumberOfCalls, AddItemModel);
 
-            var call = await GetCorrectCall(client, AddItemModel.CurrencyFrom, date);
-            int counter = 0;
-            while (call == null && counter < maxNumberOfCalls)
-            {
-                StaticFunctions.PreviousDay(ref date, "yyyy-MM-dd");
-                call = await GetCorrectCall(client, AddItemModel.CurrencyFrom, date);
-                counter++;
-            }
-            if (call == null)
-            {
-                ErrorString = "</br>Nie odnaleziono strony z tabelami lub przekroczono iloœæ zapytañ. SprawdŸ dzia³anie strony NBP.";
-                return RedirectToPage();
-            }
-            else
-            {
-                ErrorString = null;
-            }
-            // Creating new Item
-            Item newItem = new Item()
-            {
-                Name = AddItemModel.Name,
-                Date = AddItemModel.Date,
-                Price = AddItemModel.Price,
-                CurrencyFrom = AddItemModel.CurrencyFrom,
-                Rate = (decimal)call.Rates[0].Mid,
-                DateTable = DateTime.Parse(call.Rates[0].EffectiveDate),
-                ConvertedPrice = (decimal)call.Rates[0].Mid * AddItemModel.Price,
-                CurrencyTo = AddItemModel.CurrencyTo
-            };
-            // Adding item to database
-            await TableOperations.AddItemToItemTable(_context, TableI, newItem);
-            Messages = "Dodano nowy przedmiot!";
-            if (newItem.Date != newItem.DateTable)
-                Messages += "</br>Data transakcji <b>" + newItem.Date.ToString("yyyy-MM-dd") + "</b> jest inna od daty tabeli <b>" + newItem.DateTable.ToString("yyyy-MM-dd") + "</b>";
+            ErrorString = errMsg.Item1;
+            Messages = errMsg.Item2;
+            
             return RedirectToPage();
         }
 
@@ -234,11 +148,8 @@ namespace CurrencyApp.Pages
         public async Task<IActionResult> OnPostDeleteItemAsync(int number)
         {
             TableI = await SetItemsAsync();
-            Item item = TableI.Items.FirstOrDefault(x => x.Position == number);
-            await ChangePosWithoutAsync(Ids, number);
-            _context.Items.Remove(item);
 
-            await _context.SaveChangesAsync();
+            await ItemLogic.DeleteItemAsync(_context, TableI, number, Ids);
             return RedirectToPage();
             // Adding item to database
         }
@@ -247,9 +158,7 @@ namespace CurrencyApp.Pages
         public async Task<IActionResult> OnPostDeleteAllItemsAsync()
         {
             TableI = await SetItemsAsync();
-            _context.Items.RemoveRange(TableI.Items);
-
-            await _context.SaveChangesAsync();
+            await ItemLogic.DeleteAllItemsAsync(_context, TableI);
             return RedirectToPage();
         }
         // To save a changes in position of list to database
@@ -266,7 +175,7 @@ namespace CurrencyApp.Pages
             // Getting Data from Database
             TableI = await SetItemsAsync();
             ErrorString = "";
-            string correctness = StaticFunctions.IsStringOfItemTable(FromExcel);
+            string correctness = UtilFunctions.IsStringOfItemTable(FromExcel);
             if (correctness != "SUCCESS")
             {
                 ErrorString = correctness;
@@ -293,6 +202,41 @@ namespace CurrencyApp.Pages
         }
 
 
+        private async Task<ItemTable> SetItemsAsync()
+        {
+            // For now the user can only have 1 Table, although Database is prepared for N-N relationship
+            string username = User.Identity.Name;
+            int userId = (await _context.Users.FirstOrDefaultAsync(x => x.UserName == username)).Id;
+            // Getting Data from Database 
+            int tableId = (await _context.UserTables.FirstOrDefaultAsync(x => x.UserId == userId)).TableId;
+
+            var table = await _context.ItemTables.Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == tableId);
+            table.Items = table.Items.OrderBy(x => x.Position).ToList();
+
+            return table;
+        }
+
+        // To change places list of items
+        private async Task ChangePosAsync(int[] ids)
+        {
+            if (UtilFunctions.IsSorted(ids))
+            {
+                TableI = await SetItemsAsync();
+                return;
+            }
+            var table = await SetItemsAsync();
+            int counter = 0;
+            List<Item> items = table.Items.ToList(); // To use indexes I have to cast ICollection to List
+            foreach (var id in ids)
+            {
+                items[id].Position = counter++;
+            }
+            table.Items = items;
+            table.Items = table.Items.OrderBy(x => x.Position).ToList();
+            await _context.SaveChangesAsync();
+            TableI = table;
+        }
+        // To change places list of items
 
         // Private methods to clarify code
         private void SetCurrencies()
@@ -304,29 +248,5 @@ namespace CurrencyApp.Pages
             AddItemModel.CurrenciesTo.Add(new SelectListItem { Value = "PLN", Text = "PLN" });
         }
 
-        private async Task<SingleRateModel> GetCorrectCall(HttpClient client, string code, string date)
-        {
-            try
-            {
-                return await client.GetFromJsonAsync<SingleRateModel>($"rates/A/{code}/{date}?format=json");
-            }
-            catch (Exception ex)
-            {
-                ErrorString = $"Error has accured:</br>{ex.Message}</br>";
-                return null;
-            }
-        }
-
-        private async Task<SingleRateModel> GetCorrectCallNOERROR(HttpClient client, string code, string date)
-        {
-            try
-            {
-                return await client.GetFromJsonAsync<SingleRateModel>($"rates/A/{code}/{date}?format=json");
-            }
-            catch
-            {
-                return null;
-            }
-        }
     }
 }

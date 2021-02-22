@@ -25,35 +25,43 @@ namespace CurrencyApp.Backend.Application.ItemTableLogic
 
             string[] rows = FromExcel.Split("\r\n");
             List<string> addedItems = new List<string>();
-            //var client = _clientFactory.CreateClient("nbp");
-            //var maxNumberOfCalls = _configuration.GetValue<int>("MaxNumberOfCalls");
             foreach (var row in rows.Skip(1))
             {
 
                 string[] words = row.Split("\t");
                 // call to API http://api.nbp.pl/api/exchangerates/rates/{table}/code}/{date}/
+                // date format is RRRR-MM-DD
 
-                // date = RRRR-MM-DD
-
-                // We need the date from day before the transaction
                 var date = DateTime.Parse(words[1]).ToString("yyyy-MM-dd");
-                StaticFunctions.PreviousDay(ref date, "yyyy-MM-dd");
-
-                var call = await GetCorrectCallNOERROR(client, words[3], date);
                 string errString;
-                int counter = 0;
-                while (call == null && counter < maxNumberOfCalls)
+                SingleRateModel call = null;
+
+                // You cannot "plan" an transaction
+                if (DateTime.Parse(words[1]) > DateTime.Now)
                 {
-                    StaticFunctions.PreviousDay(ref date, "yyyy-MM-dd");
-                    call = await GetCorrectCallNOERROR(client, words[3], date);
-                    counter++;
+                    errString = "Nie udało się dodać przedmiotu <b>" + words[0] + "</b>. Data transakcji jest później niż dzisiaj </br>";
                 }
-                if (call == null)
-                    // If the call excited the maximum call amount
-                    errString = "Nie udało się dodać przedmiotu <b>" + words[0] + "</b>. Błąd przy wysyłaniu zapytania </br>";
                 else
-                    errString = null;
-                if (!string.IsNullOrWhiteSpace(errString))
+                {
+                    // We need the date from day before the transaction
+                    UtilFunctions.PreviousDay(ref date, "yyyy-MM-dd");
+
+                    call = await GetCorrectCallNOERROR(client, words[3], date);
+                                        int counter = 0;
+                    while (call == null && counter < maxNumberOfCalls)
+                    {
+                        UtilFunctions.PreviousDay(ref date, "yyyy-MM-dd");
+                        call = await GetCorrectCallNOERROR(client, words[3], date);
+                        counter++;
+                    }
+                    if (call == null)
+                        // If the call excited the maximum call amount
+                        errString = "Nie udało się dodać przedmiotu <b>" + words[0] + "</b>. Błąd przy wysyłaniu zapytania </br>";
+                    else
+                        errString = null;
+                }
+
+                if (!string.IsNullOrWhiteSpace(errString) && call != null)
                     errorString += errString;
                 else
                 {
